@@ -106,7 +106,7 @@
  SSL client stash file                  (SSL_CLNT_STASH) = 
 
  Maximum query degree of parallelism   (MAX_QUERYDEGREE) = ANY
- Enable intra-partition parallelism     (INTRA_PARALLEL) = NO
+ Enable intra-partition parallelism     (INTRA_PARALLEL) = YES
 
  Maximum Asynchronous TQs per query    (FEDERATED_ASYNC) = 0
 
