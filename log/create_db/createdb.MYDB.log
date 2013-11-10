@@ -1,0 +1,69 @@
+CREATE DB MYDB ON /var/lib/db2,/disk/disk2/db2,/disk/disk3/db2,/disk/disk4/db2 AUTOCONFIGURE USING MEM_PERCENT 80 APPLY DB AND DBM
+        Former and Applied Values for Database Manager Configuration
+
+ Description                                   Parameter   Former Value        Applied Value
+ -------------------------------------------------------------------------------------------------
+ Application support layer heap size (4KB)   (ASLHEAPSZ) = 15                  15                 
+ No. of int. communication buffers(4KB)(FCM_NUM_BUFFERS) = AUTOMATIC           AUTOMATIC          
+ Enable intra-partition parallelism     (INTRA_PARALLEL) = NO                  YES                
+ Maximum query degree of parallelism   (MAX_QUERYDEGREE) = ANY                 ANY                
+ Agent pool size                        (NUM_POOLAGENTS) = AUTOMATIC(100)      AUTOMATIC(100)     
+ Initial number of agents in pool       (NUM_INITAGENTS) = 0                   0                  
+ Max requester I/O block size (bytes)         (RQRIOBLK) = 65535               65535              
+ Sort heap threshold (4KB)                  (SHEAPTHRES) = 0                   0                  
+
+
+        Former and Applied Values for Database Configuration
+
+ Description                                   Parameter   Former Value        Applied Value
+ -------------------------------------------------------------------------------------------------
+ Default application heap (4KB)             (APPLHEAPSZ) = 256                 256                
+ Catalog cache size (4KB)              (CATALOGCACHE_SZ) = (MAXAPPLS*5)        360                
+ Changed pages threshold                (CHNGPGS_THRESH) = 60                  80                 
+ Database heap (4KB)                            (DBHEAP) = 1200                6248               
+ Degree of parallelism                      (DFT_DEGREE) = 1                   ANY                
+ Default tablespace extentsize (pages)   (DFT_EXTENT_SZ) = 4                   4                  
+ Default prefetch size (pages)         (DFT_PREFETCH_SZ) = AUTOMATIC           AUTOMATIC          
+ Default query optimization class         (DFT_QUERYOPT) = 5                   5                  
+ Max storage for lock list (4KB)              (LOCKLIST) = 4096                AUTOMATIC          
+ Log file size (4KB)                         (LOGFILSIZ) = 1000                1024               
+ Number of primary log files                (LOGPRIMARY) = 3                   45                 
+ Number of secondary log files               (LOGSECOND) = 10                  19                 
+ Max number of active applications            (MAXAPPLS) = AUTOMATIC           AUTOMATIC          
+ Percent. of lock lists per application       (MAXLOCKS) = 10                  AUTOMATIC          
+ Number of asynchronous page cleaners   (NUM_IOCLEANERS) = 4                   2                  
+ Number of I/O servers                   (NUM_IOSERVERS) = 16                  12                 
+ Package cache size (4KB)                   (PCKCACHESZ) = (MAXAPPLS*8)        AUTOMATIC          
+ Sort list heap (4KB)                         (SORTHEAP) = 256                 49093              
+ SQL statement heap (4KB)                     (STMTHEAP) = 8192                16384              
+ Statistics heap size (4KB)               (STAT_HEAP_SZ) = 4384                4384               
+ Utilities heap size (4KB)                (UTIL_HEAP_SZ) = 5000                AUTOMATIC          
+ Self tuning memory                    (SELF_TUNING_MEM) = OFF                 ON                 
+     Automatic runstats                  (AUTO_RUNSTATS) = ON                  ON                 
+ Sort heap thres for shared sorts (4KB) (SHEAPTHRES_SHR) = 5000                981876             
+ Log buffer size (4KB)                        (LOGBUFSZ) = 256                 2152               
+ Default table organization              (DFT_TABLE_ORG) = ROW                 COLUMN             
+ Database memory threshold               (DB_MEM_THRESH) = 100                 100                
+
+
+        Former and Applied Values for Bufferpool(s)
+
+ Description                                   Parameter   Former Value        Applied Value
+ -------------------------------------------------------------------------------------------------
+ IBMDEFAULTBP                            Bufferpool size = 1000                122734             
+
+
+        Former and Applied Values for System WLM Objects
+
+ Description                                               Former Value        Applied Value
+ -------------------------------------------------------------------------------------------------
+ Work Action SYSMAPMANAGEDQUERIES Enabled                = Y                   Y                  
+ Work Action Set SYSDEFAULTUSERWAS Enabled               = Y                   Y                  
+ Work Class SYSMANAGEDQUERIES Timeroncost                = 1.50000E+05         1.50000E+05        
+ Threshold SYSDEFAULTCONCURRENT Enabled                  = Y                   Y                  
+ Threshold SYSDEFAULTCONCURRENT Maxvalue                 = 11                  11                 
+
+
+DB210209I  The database was created successfully. Please restart the instance 
+so configuration changes take effect.
+
