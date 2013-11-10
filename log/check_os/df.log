@@ -1,0 +1,15 @@
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/mapper/vg_devsv02-lv_root
+                      51606140  11357588  37627112  24% /
+proc                         0         0         0   -  /proc
+sysfs                        0         0         0   -  /sys
+devpts                       0         0         0   -  /dev/pts
+tmpfs                  8162708         4   8162704   1% /dev/shm
+/dev/sda1               495844     38597    431647   9% /boot
+/dev/mapper/vg_devsv02-lv_home
+                     227614036    230664 215821184   1% /home
+/dev/sdb1            287826944    195612 273010580   1% /disk/disk2
+/dev/sdc1            287826944    195612 273010580   1% /disk/disk3
+/dev/sdd1            287826944    195612 273010580   1% /disk/disk4
+none                         0         0         0   -  /proc/sys/fs/binfmt_misc
+sunrpc                       0         0         0   -  /var/lib/nfs/rpc_pipefs
