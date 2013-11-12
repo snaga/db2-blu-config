@@ -5,29 +5,21 @@
 -- Copyright (C) 2002-2008 Mark Wong & Open Source Development Labss, Inc.
 -- Copyright (C) 2013 Uptime Technologies, LLC.
 --
-TRUNCATE TABLE supplier IMMEDIATE;
-TRUNCATE TABLE part IMMEDIATE;
-TRUNCATE TABLE partsupp IMMEDIATE;
-TRUNCATE TABLE customer IMMEDIATE;
-TRUNCATE TABLE orders IMMEDIATE;
-TRUNCATE TABLE lineitem IMMEDIATE;
-TRUNCATE TABLE nation IMMEDIATE;
-TRUNCATE TABLE region IMMEDIATE;
+LOAD FROM /tmp/data/supplier.csv OF DEL REPLACE INTO supplier;
+LOAD FROM /tmp/data/part.csv OF DEL REPLACE INTO part;
+LOAD FROM /tmp/data/partsupp.csv OF DEL REPLACE INTO partsupp;
+LOAD FROM /tmp/data/customer.csv OF DEL REPLACE INTO customer;
+LOAD FROM /tmp/data/orders.csv OF DEL REPLACE INTO orders;
+LOAD FROM /tmp/data/lineitem.csv OF DEL REPLACE INTO lineitem;
+LOAD FROM /tmp/data/nation.csv OF DEL REPLACE INTO nation;
+LOAD FROM /tmp/data/region.csv OF DEL REPLACE INTO region;
 
-LOAD FROM ./data/supplier.csv OF DEL REPLACE INTO supplier;
-LOAD FROM ./data/part.csv OF DEL REPLACE INTO part;
-LOAD FROM ./data/partsupp.csv OF DEL REPLACE INTO partsupp;
-LOAD FROM ./data/customer.csv OF DEL REPLACE INTO customer;
-LOAD FROM ./data/orders.csv OF DEL REPLACE INTO orders;
-LOAD FROM ./data/lineitem.csv OF DEL REPLACE INTO lineitem;
-LOAD FROM ./data/nation.csv OF DEL REPLACE INTO nation;
-LOAD FROM ./data/region.csv OF DEL REPLACE INTO region;
+-- SELECT count(*) FROM supplier;
+-- SELECT count(*) FROM part;
+-- SELECT count(*) FROM partsupp;
+-- SELECT count(*) FROM customer;
+-- SELECT count(*) FROM orders;
+-- SELECT count(*) FROM lineitem;
+-- SELECT count(*) FROM nation;
+-- SELECT count(*) FROM region;
 
-SELECT count(*) FROM supplier;
-SELECT count(*) FROM part;
-SELECT count(*) FROM partsupp;
-SELECT count(*) FROM customer;
-SELECT count(*) FROM orders;
-SELECT count(*) FROM lineitem;
-SELECT count(*) FROM nation;
-SELECT count(*) FROM region;
