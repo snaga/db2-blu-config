@@ -16,6 +16,8 @@ else
     exit
 fi;
 
+../bin/check_db2.sh
+
 cat /dev/null > run_dbt3.log
 
 date | tee -a run_dbt3.log
@@ -41,6 +43,6 @@ date | tee -a run_dbt3.log
 sleep 10
 
 # clean up
-date | tee -a run_dbt3.log
-db2 -tvf ../dbt3/dbt3-db2-truncate-tables.sql | tee -a run_dbt3.log
-date | tee -a run_dbt3.log
+# date | tee -a run_dbt3.log
+#db2 -tvf ../dbt3/dbt3-db2-truncate-tables.sql | tee -a run_dbt3.log
+# date | tee -a run_dbt3.log
