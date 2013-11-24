@@ -13,3 +13,19 @@ DESCRIBE TABLE orders;
 DESCRIBE TABLE lineitem;
 DESCRIBE TABLE nation;
 DESCRIBE TABLE region;
+
+SELECT varchar(tabschema,16) tabschema,
+       varchar(tabname,16) tabname,
+       tableorg
+  FROM syscat.tables
+ WHERE tabschema = 'DB2INST1'
+ ORDER BY tabschema,tabname;
+
+SELECT varchar(tabname,16) tabname,
+       data_object_p_size,
+       index_object_p_size,
+       col_object_p_size,
+       data_object_p_size + index_object_p_size + col_object_p_size allsize
+  FROM sysibmadm.admintabinfo
+ WHERE tabschema = 'DB2INST1'
+ ORDER BY tabname;
