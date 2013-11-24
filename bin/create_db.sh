@@ -16,8 +16,17 @@ else
     exit
 fi;
 
-db2 -v "CREATE DB ${DBNAME}${PARTITION} ON ${DISK} AUTOCONFIGURE USING MEM_PERCENT 80 APPLY DB AND DBM" | tee -a createdb.${DBNAME}.log
+db2 -v "CREATE DB ${DBNAME}${PARTITION} ON ${DISK} AUTOCONFIGURE USING MEM_PERCENT 80 APPLY DB AND DBM" | tee -a createdb.${DBNAME}${PARTITION}.log
 
 # to apply recommended shared memory size. (SQL1084C)
-# db2 "CONNECT TO ${DBNAME}${PARTITION}" | tee -a createdb.${DBNAME}.log
+db2 "CONNECT TO ${DBNAME}${PARTITION}" | tee -a createdb.${DBNAME}${PARTITION}.log
+db2 -tvf /opt/ibm/db2/V10.5/misc/EXPLAIN.DDL | tee -a createdb.${DBNAME}${PARTITION}.log
+
 # db2 "AUTOCONFIGURE APPLY NONE" | tee -a createdb.${DBNAME}.log
+
+db2 update db cfg for ${DBNAME}${PARTITION} using LOGPRIMARY 128 | tee -a createdb.${DBNAME}${PARTITION}.log
+db2 update db cfg for ${DBNAME}${PARTITION} using LOGSECOND 128 | tee -a createdb.${DBNAME}${PARTITION}.log
+
+db2stop
+db2start
+
