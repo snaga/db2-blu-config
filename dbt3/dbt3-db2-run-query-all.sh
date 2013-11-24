@@ -18,6 +18,9 @@ fi;
 
 ../bin/stop-stats.sh
 
+db2 "CONNECT TO ${DBNAME}${PARTITION}"
+db2 "GET DB CFG FOR ${DBNAME}${PARTITION}" | tee db2dbcfg_${DBNAME}${PARTITION}.log
+
 ./dbt3-db2-run-query.sh $DBNAME $PARTITION q/1.sql
 ./dbt3-db2-run-query.sh $DBNAME $PARTITION q/2.sql
 ./dbt3-db2-run-query.sh $DBNAME $PARTITION q/3.sql
