@@ -6,7 +6,7 @@ DBNAME=$1
 PARTITION=$2
 QUERY=$3
 
-INTERVAL=1
+INTERVAL=30
 
 if [ "$PARTITION" = "1" ]; then
     echo -n ""
@@ -38,17 +38,41 @@ db2exfmt -d ${DBNAME}${PARTITION} -e db2admin -n -1 -s -1 -w -1 -# no_map_char -
 # 1st
 sleep $INTERVAL;
 echo Starting $QUERY...
-db2 -tvf $QUERY > Q${QUERYFILE}.out
+date >> Q${QUERYFILE}.out
+db2 -tvf $QUERY >> Q${QUERYFILE}.out
+date >> Q${QUERYFILE}.out
 
 # 2nd
 sleep $INTERVAL;
 echo Starting $QUERY...
+date >> Q${QUERYFILE}.out
 db2 -tvf $QUERY >> Q${QUERYFILE}.out
+date >> Q${QUERYFILE}.out
 
 # 3rd
 sleep $INTERVAL;
 echo Starting $QUERY...
+date >> Q${QUERYFILE}.out
 db2 -tvf $QUERY >> Q${QUERYFILE}.out
+date >> Q${QUERYFILE}.out
+
+# 4th
+sleep $INTERVAL;
+echo Starting $QUERY...
+date >> Q${QUERYFILE}.out
+db2 -tvf $QUERY >> Q${QUERYFILE}.out
+date >> Q${QUERYFILE}.out
+
+# 5th
+sleep $INTERVAL;
+echo Starting $QUERY...
+date >> Q${QUERYFILE}.out
+db2 -tvf $QUERY >> Q${QUERYFILE}.out
+date >> Q${QUERYFILE}.out
+
 sleep $INTERVAL;
 
 ../bin/stop-stats.sh
+
+echo "Subject: $QUERY/${DBNAME}${PARTITION} finished" | /usr/lib/sendmail snaga@uptime.jp
+
