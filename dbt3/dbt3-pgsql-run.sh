@@ -30,6 +30,8 @@ sleep $INTERVAL
 
 date | tee -a run_dbt3.log
 psql -f ../dbt3/dbt3-pgsql-load-data.sql -U postgres ${DBNAME}${PARTITION} | tee -a run_dbt3.log
+psql -f ../dbt3/dbt3-pgsql-create-indexes.sql -U postgres ${DBNAME}${PARTITION} | tee -a prep_dbt3.log
+psql -f ../dbt3/dbt3-pgsql-describe-tables.sql -U postgres ${DBNAME}${PARTITION} | tee -a prep_dbt3.log
 date | tee -a run_dbt3.log
 
 sleep $INTERVAL

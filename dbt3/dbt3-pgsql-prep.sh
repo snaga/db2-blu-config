@@ -19,5 +19,5 @@ cat /dev/null > prep_dbt3.log
 
 psql -f ../dbt3/dbt3-pgsql-drop-tables.sql -U postgres ${DBNAME}${PARTITION} | tee -a prep_dbt3.log
 psql -f ../dbt3/dbt3-pgsql-create-tables.sql -U postgres ${DBNAME}${PARTITION} | tee -a prep_dbt3.log
-psql -f ../dbt3/dbt3-pgsql-create-indexes.sql -U postgres ${DBNAME}${PARTITION} | tee -a prep_dbt3.log
+#psql -f ../dbt3/dbt3-pgsql-create-indexes.sql -U postgres ${DBNAME}${PARTITION} | tee -a prep_dbt3.log
 psql -f ../dbt3/dbt3-pgsql-describe-tables.sql -U postgres ${DBNAME}${PARTITION} | tee -a prep_dbt3.log
