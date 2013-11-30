@@ -38,6 +38,9 @@ db2 -tvf ../dbt3/dbt3-db2-load-data.sql | tee -a run_dbt3.log
 date | tee -a run_dbt3.log
 
 sleep $INTERVAL
+db2 -tvf dbt3-db2-describe-tables.sql | tee -a run_dbt3.log
+
+sleep $INTERVAL
 ../bin/stop-stats.sh
 
 date | tee -a run_dbt3.log
