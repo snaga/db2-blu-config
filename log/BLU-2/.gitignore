@@ -1,0 +1,8 @@
+dbt3-db2-run.log
+dbt3-db2-run-query-all.log
+*.iostat.log
+*.mpstat.log
+*.vmstat.log
+*.out
+run_dbt3.log
+

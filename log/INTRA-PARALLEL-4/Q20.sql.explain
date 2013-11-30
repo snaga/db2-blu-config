@@ -1,0 +1,2100 @@
+DB2 Universal Database Version 10.5, 5622-044 (c) Copyright IBM Corp. 1991, 2012
+Licensed Material - Program Property of IBM
+IBM DATABASE 2 Explain Table Format Tool
+
+
+
+******************** EXPLAIN INSTANCE ********************
+
+DB2_VERSION:       10.05.2
+FORMATTED ON DB:   TESTDB4
+SOURCE_NAME:       SQLC2K26
+SOURCE_SCHEMA:     NULLID  
+SOURCE_VERSION:      
+EXPLAIN_TIME:      2013-11-24-02.32.46.526301
+EXPLAIN_REQUESTER: DB2INST1
+
+Database Context:
+----------------
+	Parallelism:          Intra-Partition Parallelism
+	CPU Speed:            3.188323e-07
+	Comm Speed:           100
+	Buffer Pool size:     121805
+	Sort Heap size:       49093
+	Database Heap size:   6248
+	Lock List size:       283558
+	Maximum Lock List:    98
+	Average Applications: 1
+	Locks Available:      8892379
+
+Package Context:
+---------------
+	SQL Type:           Dynamic
+	Optimization Level: 5
+	Blocking:           Block All Cursors
+	Isolation Level:    Cursor Stability
+
+
+
+---------------- STATEMENT 1  SECTION 201 ----------------
+	QUERYNO:       2
+	QUERYTAG:      CLP                 
+	Statement Type:   Select
+	Updatable:        No
+	Deletable:        No
+	Query Degree:     -1
+
+Original Statement:
+------------------
+select 
+  s_name,
+  s_address 
+from 
+  supplier,
+  nation 
+where 
+  s_suppkey in 
+  (select 
+     distinct (ps_suppkey) 
+   from 
+     partsupp,
+     part 
+   where 
+     ps_partkey=p_partkey and 
+     p_name like 'navy%' and 
+     ps_availqty > 
+     (select 
+        0.5 * sum(l_quantity) 
+      from 
+        lineitem 
+      where 
+        l_partkey = ps_partkey and 
+        l_suppkey = ps_suppkey and 
+        l_shipdate >= date('1995-01-01') and 
+        l_shipdate < date('1995-01-01') + 1 year
+     )
+  ) and 
+  s_nationkey = n_nationkey and 
+  n_name = 'ALGERIA' 
+order by 
+  s_name
+
+
+Optimized Statement:
+-------------------
+SELECT 
+  DISTINCT Q7.S_NAME AS "S_NAME",
+  Q7.S_ADDRESS AS "S_ADDRESS",
+  Q6.N_NATIONKEY,
+  Q7.S_SUPPKEY 
+FROM 
+  (SELECT 
+     SUM(Q2.L_QUANTITY) 
+   FROM 
+     (SELECT 
+        Q1.L_QUANTITY 
+      FROM 
+        DB2INST1.LINEITEM AS Q1 
+      WHERE 
+        (Q1.L_SHIPDATE < '01/01/1996') AND 
+        ('01/01/1995' <= Q1.L_SHIPDATE) AND 
+        (Q1.L_SUPPKEY = Q4.PS_SUPPKEY) AND 
+        (Q1.L_PARTKEY = Q4.PS_PARTKEY)
+     ) AS Q2
+  ) AS Q3,
+  DB2INST1.PARTSUPP AS Q4,
+  DB2INST1.PART AS Q5,
+  DB2INST1.NATION AS Q6,
+  DB2INST1.SUPPLIER AS Q7 
+WHERE 
+  (Q5.P_NAME LIKE 'navy%') AND 
+  (Q4.PS_PARTKEY = Q5.P_PARTKEY) AND 
+  ((+5.00000000000000E-001 * Q3.$C0) < Q4.PS_AVAILQTY) AND 
+  (Q6.N_NAME = 'ALGERIA ') AND 
+  (Q7.S_NATIONKEY = Q6.N_NATIONKEY) AND 
+  (Q7.S_SUPPKEY = Q4.PS_SUPPKEY) 
+ORDER BY 
+  Q7.S_NAME
+
+Access Plan:
+-----------
+	Total Cost: 		205487
+	Query Degree:		4
+
+                                                                                   Rows 
+                                                                                  RETURN
+                                                                                  (   1)
+                                                                                   Cost 
+                                                                                    I/O 
+                                                                                    |
+                                                                                0.00339329 
+                                                                                  UNIQUE
+                                                                                  (   2)
+                                                                                  205487 
+                                                                                  94506.5 
+                                                                                    |
+                                                                                0.00339329 
+                                                                                  LMTQ  
+                                                                                  (   3)
+                                                                                  205487 
+                                                                                  94506.5 
+                                                                                    |
+                                                                                0.00339329 
+                                                                                  ^NLJOIN
+                                                                                  (   4)
+                                                                                  205487 
+                                                                                  94506.5 
+                                                             /----------------------+-----------------------\
+                                                        0.190735                                           0.0177906 
+                                                         TBSCAN                                             FILTER
+                                                         (   5)                                             (  19)
+                                                         205451                                             29.6378 
+                                                         94496.1                                            8.37782 
+                                                           |                                                  |
+                                                        0.190735                                               1 
+                                                         SORT                                               GRPBY 
+                                                         (   6)                                             (  20)
+                                                         205451                                             29.6372 
+                                                         94496.1                                            8.37782 
+                                                           |                                                  |
+                                                        0.190735                                            1.1386 
+                                                         ^HSJOIN                                            FETCH 
+                                                         (   7)                                             (  21)
+                                                         205451                                             29.637 
+                                                         94496.1                                            8.37782 
+                                    /----------------------+----------------------\                       /---+----\
+                                4.76837                                              1                7.50277    6.00038e+08 
+                                ^NLJOIN                                           FETCH               RIDSCN   TABLE: DB2INST1
+                                (   8)                                            (  17)              (  22)      LINEITEM
+                                205444                                            7.08669             14.1227        Q1
+                                94495.1                                              1                   2 
+                    /-------------+--------------\                             /----+----\              |
+                4.76837                             1                        25            25         7.50277 
+                REBAL                            FETCH                     IXSCAN    TABLE: DB2INST1  SORT  
+                (   9)                           (  15)                    (  18)        NATION       (  23)
+                205376                           14.144                   0.0264577        Q6         14.1223 
+                94485.6                             2                         0                          2 
+                  |                            /---+----\                    |                          |
+                4.76837                       1          1e+06               25                       7.50277 
+                NLJOIN                     IXSCAN   TABLE: DB2INST1    INDEX: SYSIBM                  IXSCAN
+                (  10)                     (  16)      SUPPLIER      SQL131123131458630               (  24)
+                205376                     7.09429        Q7                 Q6                       14.1212 
+                94485.6                       1                                                          2 
+         /--------+---------\                |                                                          |
+     1.19209                   4            1e+06                                                   6.00038e+08 
+     REBAL                  FETCH      INDEX: SYSIBM                                              INDEX: DB2INST1
+     (  11)                 (  13)   SQL131123131458230                                         I_L_SUPPKEY_PARTKEY
+     205351                 21.1666          Q7                                                         Q1
+      94482                    3 
+       |                  /---+---\
+     1.19209             4         8e+07 
+     TBSCAN           IXSCAN  TABLE: DB2INST1
+     (  12)           (  14)     PARTSUPP
+     205351           14.116        Q4
+      94482              2 
+       |                |
+      2e+07            8e+07 
+ TABLE: DB2INST1  INDEX: DB2INST1
+      PART         I_PS_PARTKEY
+       Q5               Q4
+
+
+Operator Symbols :
+------------------
+
+   Symbol      Description
+   ---------   ------------------------------------------
+   >JOIN     : Left outer join
+    JOIN<    : Right outer join
+   >JOIN<    : Full outer join
+   xJOIN     : Left antijoin
+    JOINx    : Right antijoin
+   ^JOIN     : Left early out
+    JOIN^    : Right early out
+   ATQ       : Asynchrony
+   BTQ       : Broadcast
+   CTQ       : Column-organized data
+   DTQ       : Directed
+   LTQ       : Intra-partition parallelism
+   MTQ       : Merging (sorted)
+   STQ       : Scatter
+   XTQ       : XML aggregation
+    TQ*      : Listener
+
+
+Extended Diagnostic Information:
+--------------------------------
+
+No extended Diagnostic Information for this statement.
+
+
+Plan Details:
+-------------
+
+
+	1) RETURN: (Return Result)
+		Cumulative Total Cost: 		205487
+		Cumulative CPU Cost: 		5.10169e+10
+		Cumulative I/O Cost: 		94506.5
+		Cumulative Re-Total Cost: 	205451
+		Cumulative Re-CPU Cost: 	5.10166e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	205487
+		Estimated Bufferpool Buffers: 	8.37782
+
+		Arguments:
+		---------
+		BLDLEVEL: (Build level)
+			DB2 v10.5.0.2 : s131001
+		ENVVAR  : (Environment Variable)
+			DB2_WORKLOAD=ANALYTICS
+		HEAPUSE : (Maximum Statement Heap Usage)
+			192 Pages
+		PREPTIME: (Statement prepare time)
+			        24 milliseconds
+		STMTHEAP: (Statement heap size)
+			16384
+
+		Input Streams:
+		-------------
+			32) From Operator #2
+
+				Estimated number of rows: 	0.00339329
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.S_NAME(A)+Q8.S_ADDRESS
+
+
+	2) UNIQUE: (Unique)
+		Cumulative Total Cost: 		205487
+		Cumulative CPU Cost: 		5.10169e+10
+		Cumulative I/O Cost: 		94506.5
+		Cumulative Re-Total Cost: 	205451
+		Cumulative Re-CPU Cost: 	5.10166e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	205487
+		Estimated Bufferpool Buffers: 	8.37782
+
+		Arguments:
+		---------
+		UNIQKEY : (Unique Key columns)
+			1: Q7.S_SUPPKEY
+
+		Input Streams:
+		-------------
+			31) From Operator #3
+
+				Estimated number of rows: 	0.00339329
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_NAME(A)+Q7.S_SUPPKEY(A)+Q6.N_NATIONKEY
+				+Q7.S_ADDRESS
+
+
+		Output Streams:
+		--------------
+			32) To Operator #1
+
+				Estimated number of rows: 	0.00339329
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.S_NAME(A)+Q8.S_ADDRESS
+
+
+	3) TQ    : (Table Queue)
+		Cumulative Total Cost: 		205487
+		Cumulative CPU Cost: 		5.10169e+10
+		Cumulative I/O Cost: 		94506.5
+		Cumulative Re-Total Cost: 	205451
+		Cumulative Re-CPU Cost: 	5.10166e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	205487
+		Estimated Bufferpool Buffers: 	8.37782
+
+		Arguments:
+		---------
+		LISTENER: (Listener Table Queue type)
+			FALSE
+		SORTKEY : (Sort Key column)
+			1: Q7.S_NAME(A)
+			2: Q7.S_SUPPKEY(A)
+		TQ TYPE : (Table queue type)
+			LOCAL
+		TQDEGREE: (Degree of Intra-Partition parallelism)
+			4
+		TQMERGE : (Merging Table Queue flag)
+			TRUE
+		TQREAD  : (Table Queue Read type)
+			READ AHEAD
+		UNIQUE  : (Uniqueness required flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			30) From Operator #4
+
+				Estimated number of rows: 	0.00339329
+				Number of columns: 		8
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_NAME(A)+Q7.S_SUPPKEY(A)+Q3.$C0
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+				+Q6.N_NATIONKEY+Q7.S_ADDRESS
+
+
+		Output Streams:
+		--------------
+			31) To Operator #2
+
+				Estimated number of rows: 	0.00339329
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_NAME(A)+Q7.S_SUPPKEY(A)+Q6.N_NATIONKEY
+				+Q7.S_ADDRESS
+
+
+	4) NLJOIN: (Nested Loop Join)
+		Cumulative Total Cost: 		205487
+		Cumulative CPU Cost: 		5.10167e+10
+		Cumulative I/O Cost: 		94506.5
+		Cumulative Re-Total Cost: 	205451
+		Cumulative Re-CPU Cost: 	5.10166e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	205487
+		Estimated Bufferpool Buffers: 	8.37782
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		FETCHMAX: (Override for FETCH MAXPAGES)
+			IGNORE
+		ISCANMAX: (Override for ISCAN MAXPAGES)
+			IGNORE
+
+		Predicates:
+		----------
+		6) Predicate used in Join, 
+			Comparison Operator: 		Less Than (<)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.0177906
+
+			Predicate Text:
+			--------------
+			((+5.00000000000000E-001 * Q3.$C0) < Q4.PS_AVAILQTY)
+
+
+
+		Input Streams:
+		-------------
+			21) From Operator #5
+
+				Estimated number of rows: 	0.190735
+				Number of columns: 		7
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_NAME(A)+Q7.S_SUPPKEY(A)+Q4.PS_SUPPKEY
+				+Q4.PS_AVAILQTY+Q4.PS_PARTKEY+Q6.N_NATIONKEY
+				+Q7.S_ADDRESS
+
+			29) From Operator #19
+
+				Estimated number of rows: 	0.0177906
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0
+
+
+		Output Streams:
+		--------------
+			30) To Operator #3
+
+				Estimated number of rows: 	0.00339329
+				Number of columns: 		8
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_NAME(A)+Q7.S_SUPPKEY(A)+Q3.$C0
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+				+Q6.N_NATIONKEY+Q7.S_ADDRESS
+
+
+	5) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		205451
+		Cumulative CPU Cost: 		5.10165e+10
+		Cumulative I/O Cost: 		94496.1
+		Cumulative Re-Total Cost: 	205451
+		Cumulative Re-CPU Cost: 	5.10165e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	205451
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			OUTER
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			20) From Operator #6
+
+				Estimated number of rows: 	0.190735
+				Number of columns: 		7
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_NAME(A)+Q7.S_SUPPKEY(A)+Q4.PS_SUPPKEY
+				+Q4.PS_AVAILQTY+Q4.PS_PARTKEY+Q6.N_NATIONKEY
+				+Q7.S_ADDRESS
+
+
+		Output Streams:
+		--------------
+			21) To Operator #4
+
+				Estimated number of rows: 	0.190735
+				Number of columns: 		7
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_NAME(A)+Q7.S_SUPPKEY(A)+Q4.PS_SUPPKEY
+				+Q4.PS_AVAILQTY+Q4.PS_PARTKEY+Q6.N_NATIONKEY
+				+Q7.S_ADDRESS
+
+
+	6) SORT  : (Sort)
+		Cumulative Total Cost: 		205451
+		Cumulative CPU Cost: 		5.10165e+10
+		Cumulative I/O Cost: 		94496.1
+		Cumulative Re-Total Cost: 	205451
+		Cumulative Re-CPU Cost: 	5.10165e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	205451
+		Estimated Bufferpool Buffers: 	94495.1
+
+		Arguments:
+		---------
+		DUPLWARN: (Duplicates Warning flag)
+			FALSE
+		NUMROWS : (Estimated number of rows)
+			1
+		ROWWIDTH: (Estimated width of rows)
+			84
+		SORTKEY : (Sort Key column)
+			1: Q7.S_NAME(A)
+			2: Q7.S_SUPPKEY(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			32768
+		UNIQUE  : (Uniqueness required flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			19) From Operator #7
+
+				Estimated number of rows: 	0.190735
+				Number of columns: 		8
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+				+Q6.N_NATIONKEY+Q7.S_ADDRESS+Q7.S_NAME
+				+Q7.S_NATIONKEY+Q7.S_SUPPKEY
+
+
+		Output Streams:
+		--------------
+			20) To Operator #5
+
+				Estimated number of rows: 	0.190735
+				Number of columns: 		7
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_NAME(A)+Q7.S_SUPPKEY(A)+Q4.PS_SUPPKEY
+				+Q4.PS_AVAILQTY+Q4.PS_PARTKEY+Q6.N_NATIONKEY
+				+Q7.S_ADDRESS
+
+
+	7) HSJOIN: (Hash Join)
+		Cumulative Total Cost: 		205451
+		Cumulative CPU Cost: 		5.10165e+10
+		Cumulative I/O Cost: 		94496.1
+		Cumulative Re-Total Cost: 	205451
+		Cumulative Re-CPU Cost: 	5.10165e+10
+		Cumulative Re-I/O Cost: 	94496.1
+		Cumulative First Row Cost: 	205451
+		Estimated Bufferpool Buffers: 	94495.1
+
+		Arguments:
+		---------
+		BITFLTR : (Hash Join Bit Filter used)
+			FALSE
+		EARLYOUT: (Early Out flag)
+			LEFT
+		HASHCODE: (Hash Code Size)
+			24 BIT
+		HASHTBSZ: (Number of hash table entries)
+			1
+		TEMPSIZE: (Temporary Table Page Size)
+			32768
+		TUPBLKSZ: (Tuple Block Size (bytes))
+			4000
+
+		Predicates:
+		----------
+		8) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q7.S_NATIONKEY = Q6.N_NATIONKEY)
+
+
+
+		Input Streams:
+		-------------
+			14) From Operator #8
+
+				Estimated number of rows: 	4.76837
+				Number of columns: 		7
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+				+Q7.S_ADDRESS+Q7.S_NAME+Q7.S_NATIONKEY
+				+Q7.S_SUPPKEY
+
+			18) From Operator #17
+
+				Estimated number of rows: 	1
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.N_NATIONKEY(A)
+
+
+		Output Streams:
+		--------------
+			19) To Operator #6
+
+				Estimated number of rows: 	0.190735
+				Number of columns: 		8
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+				+Q6.N_NATIONKEY+Q7.S_ADDRESS+Q7.S_NAME
+				+Q7.S_NATIONKEY+Q7.S_SUPPKEY
+
+
+	8) NLJOIN: (Nested Loop Join)
+		Cumulative Total Cost: 		205444
+		Cumulative CPU Cost: 		5.10164e+10
+		Cumulative I/O Cost: 		94495.1
+		Cumulative Re-Total Cost: 	16050.2
+		Cumulative Re-CPU Cost: 	5.03407e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	172297
+		Estimated Bufferpool Buffers: 	94495.1
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		FETCHMAX: (Override for FETCH MAXPAGES)
+			IGNORE
+		ISCANMAX: (Override for ISCAN MAXPAGES)
+			IGNORE
+		JN INPUT: (Join input leg)
+			OUTER
+
+		Predicates:
+		----------
+		9) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1e-06
+
+			Predicate Text:
+			--------------
+			(Q7.S_SUPPKEY = Q4.PS_SUPPKEY)
+
+
+
+		Input Streams:
+		-------------
+			9) From Operator #9
+
+				Estimated number of rows: 	4.76837
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+
+			13) From Operator #15
+
+				Estimated number of rows: 	1
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_SUPPKEY(A)+Q7.S_ADDRESS+Q7.S_NAME
+				+Q7.S_NATIONKEY
+
+
+		Output Streams:
+		--------------
+			14) To Operator #7
+
+				Estimated number of rows: 	4.76837
+				Number of columns: 		7
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+				+Q7.S_ADDRESS+Q7.S_NAME+Q7.S_NATIONKEY
+				+Q7.S_SUPPKEY
+
+
+	9) REBAL : (Rebalance operator)
+		Cumulative Total Cost: 		205376
+		Cumulative CPU Cost: 		5.10157e+10
+		Cumulative I/O Cost: 		94485.6
+		Cumulative Re-Total Cost: 	16050
+		Cumulative Re-CPU Cost: 	5.03401e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	172283
+		Estimated Bufferpool Buffers: 	94485.6
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			OUTER
+
+		Input Streams:
+		-------------
+			8) From Operator #10
+
+				Estimated number of rows: 	4.76837
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+				+Q5.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			9) To Operator #8
+
+				Estimated number of rows: 	4.76837
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+
+
+	10) NLJOIN: (Nested Loop Join)
+		Cumulative Total Cost: 		205376
+		Cumulative CPU Cost: 		5.10157e+10
+		Cumulative I/O Cost: 		94485.6
+		Cumulative Re-Total Cost: 	16050
+		Cumulative Re-CPU Cost: 	5.03401e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	172283
+		Estimated Bufferpool Buffers: 	94485.6
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			NONE
+		FETCHMAX: (Override for FETCH MAXPAGES)
+			IGNORE
+		ISCANMAX: (Override for ISCAN MAXPAGES)
+			IGNORE
+
+		Predicates:
+		----------
+		5) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			5e-08
+
+			Predicate Text:
+			--------------
+			(Q4.PS_PARTKEY = Q5.P_PARTKEY)
+
+
+
+		Input Streams:
+		-------------
+			3) From Operator #11
+
+				Estimated number of rows: 	1.19209
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.P_PARTKEY
+
+			7) From Operator #13
+
+				Estimated number of rows: 	4
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_PARTKEY(A)+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY
+
+
+		Output Streams:
+		--------------
+			8) To Operator #9
+
+				Estimated number of rows: 	4.76837
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY+Q4.PS_PARTKEY
+				+Q5.P_PARTKEY
+
+
+	11) REBAL : (Rebalance operator)
+		Cumulative Total Cost: 		205351
+		Cumulative CPU Cost: 		5.10156e+10
+		Cumulative I/O Cost: 		94482
+		Cumulative Re-Total Cost: 	16050
+		Cumulative Re-CPU Cost: 	5.034e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	172262
+		Estimated Bufferpool Buffers: 	94482
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			OUTER
+
+		Input Streams:
+		-------------
+			2) From Operator #12
+
+				Estimated number of rows: 	1.19209
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.P_NAME+Q5.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			3) To Operator #10
+
+				Estimated number of rows: 	1.19209
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.P_PARTKEY
+
+
+	12) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		205351
+		Cumulative CPU Cost: 		5.10156e+10
+		Cumulative I/O Cost: 		94482
+		Cumulative Re-Total Cost: 	16050
+		Cumulative Re-CPU Cost: 	5.034e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	172262
+		Estimated Bufferpool Buffers: 	94482
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL          
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SCANGRAN: (Intra-Partition Parallelism Scan Granularity)
+			2
+		SCANTYPE: (Intra-Partition Parallelism Scan Type)
+			LOCAL PARALLEL
+		SCANUNIT: (Intra-Partition Parallelism Scan Unit)
+			PAGE
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+
+		Predicates:
+		----------
+		2) Sargable Predicate, 
+			Comparison Operator: 		Like
+			Subquery Input Required: 	No
+			Filter Factor: 			5.96046e-08
+
+			Predicate Text:
+			--------------
+			(Q5.P_NAME LIKE 'navy%')
+
+
+
+		Input Streams:
+		-------------
+			1) From Object DB2INST1.PART
+
+				Estimated number of rows: 	2e+07
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.$RID$+Q5.P_NAME+Q5.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			2) To Operator #11
+
+				Estimated number of rows: 	1.19209
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.P_NAME+Q5.P_PARTKEY
+
+
+	13) FETCH : (Fetch)
+		Cumulative Total Cost: 		21.1666
+		Cumulative CPU Cost: 		99079.1
+		Cumulative I/O Cost: 		3
+		Cumulative Re-Total Cost: 	14.1061
+		Cumulative Re-CPU Cost: 	50618.1
+		Cumulative Re-I/O Cost: 	2
+		Cumulative First Row Cost: 	21.1632
+		Estimated Bufferpool Buffers: 	410378
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		JN INPUT: (Join input leg)
+			INNER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			5) From Operator #14
+
+				Estimated number of rows: 	4
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_PARTKEY(A)+Q4.$RID$
+
+			6) From Object DB2INST1.PARTSUPP
+
+				Estimated number of rows: 	8e+07
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY
+
+
+		Output Streams:
+		--------------
+			7) To Operator #10
+
+				Estimated number of rows: 	4
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_PARTKEY(A)+Q4.PS_SUPPKEY+Q4.PS_AVAILQTY
+
+
+	14) IXSCAN: (Index Scan)
+		Cumulative Total Cost: 		14.116
+		Cumulative CPU Cost: 		81529.1
+		Cumulative I/O Cost: 		2
+		Cumulative Re-Total Cost: 	7.05554
+		Cumulative Re-CPU Cost: 	33068.1
+		Cumulative Re-I/O Cost: 	1
+		Cumulative First Row Cost: 	14.1138
+		Estimated Bufferpool Buffers: 	26696
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+
+		Predicates:
+		----------
+		5) Start Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			5e-08
+
+			Predicate Text:
+			--------------
+			(Q4.PS_PARTKEY = Q5.P_PARTKEY)
+
+
+		5) Stop Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			5e-08
+
+			Predicate Text:
+			--------------
+			(Q4.PS_PARTKEY = Q5.P_PARTKEY)
+
+
+
+		Input Streams:
+		-------------
+			4) From Object DB2INST1.I_PS_PARTKEY
+
+				Estimated number of rows: 	8e+07
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_PARTKEY(A)+Q4.$RID$
+
+
+		Output Streams:
+		--------------
+			5) To Operator #13
+
+				Estimated number of rows: 	4
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.PS_PARTKEY(A)+Q4.$RID$
+
+
+	15) FETCH : (Fetch)
+		Cumulative Total Cost: 		14.144
+		Cumulative CPU Cost: 		169425
+		Cumulative I/O Cost: 		2
+		Cumulative Re-Total Cost: 	14.1327
+		Cumulative Re-CPU Cost: 	133964
+		Cumulative Re-I/O Cost: 	2
+		Cumulative First Row Cost: 	14.1437
+		Estimated Bufferpool Buffers: 	5522
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		JN INPUT: (Join input leg)
+			INNER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			11) From Operator #16
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_SUPPKEY(A)+Q7.$RID$
+
+			12) From Object DB2INST1.SUPPLIER
+
+				Estimated number of rows: 	1e+06
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_ADDRESS+Q7.S_NAME+Q7.S_NATIONKEY
+
+
+		Output Streams:
+		--------------
+			13) To Operator #8
+
+				Estimated number of rows: 	1
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_SUPPKEY(A)+Q7.S_ADDRESS+Q7.S_NAME
+				+Q7.S_NATIONKEY
+
+
+	16) IXSCAN: (Index Scan)
+		Cumulative Total Cost: 		7.09429
+		Cumulative CPU Cost: 		154605
+		Cumulative I/O Cost: 		1
+		Cumulative Re-Total Cost: 	7.08299
+		Cumulative Re-CPU Cost: 	119144
+		Cumulative Re-I/O Cost: 	1
+		Cumulative First Row Cost: 	7.09429
+		Estimated Bufferpool Buffers: 	512
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+
+		Predicates:
+		----------
+		9) Start Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1e-06
+
+			Predicate Text:
+			--------------
+			(Q7.S_SUPPKEY = Q4.PS_SUPPKEY)
+
+
+		9) Stop Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1e-06
+
+			Predicate Text:
+			--------------
+			(Q7.S_SUPPKEY = Q4.PS_SUPPKEY)
+
+
+
+		Input Streams:
+		-------------
+			10) From Object SYSIBM.SQL131123131458230
+
+				Estimated number of rows: 	1e+06
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_SUPPKEY(A)+Q7.$RID$
+
+
+		Output Streams:
+		--------------
+			11) To Operator #15
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.S_SUPPKEY(A)+Q7.$RID$
+
+
+	17) FETCH : (Fetch)
+		Cumulative Total Cost: 		7.08669
+		Cumulative CPU Cost: 		130768
+		Cumulative I/O Cost: 		1
+		Cumulative Re-Total Cost: 	0.0262421
+		Cumulative Re-CPU Cost: 	82307
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	7.08572
+		Estimated Bufferpool Buffers: 	2
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		JN INPUT: (Join input leg)
+			INNER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Predicates:
+		----------
+		7) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q6.N_NAME = 'ALGERIA ')
+
+
+
+		Input Streams:
+		-------------
+			16) From Operator #18
+
+				Estimated number of rows: 	25
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.N_NATIONKEY(A)+Q6.$RID$
+
+			17) From Object DB2INST1.NATION
+
+				Estimated number of rows: 	25
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.N_NAME
+
+
+		Output Streams:
+		--------------
+			18) To Operator #7
+
+				Estimated number of rows: 	1
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.N_NATIONKEY(A)
+
+
+	18) IXSCAN: (Index Scan)
+		Cumulative Total Cost: 		0.0264577
+		Cumulative CPU Cost: 		82983
+		Cumulative I/O Cost: 		0
+		Cumulative Re-Total Cost: 	0.0151516
+		Cumulative Re-CPU Cost: 	47522
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	0.0127399
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SCANGRAN: (Intra-Partition Parallelism Scan Granularity)
+			1
+		SCANTYPE: (Intra-Partition Parallelism Scan Type)
+			LOCAL PARALLEL
+		SCANUNIT: (Intra-Partition Parallelism Scan Unit)
+			ROW
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+
+		Input Streams:
+		-------------
+			15) From Object SYSIBM.SQL131123131458630
+
+				Estimated number of rows: 	25
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.N_NATIONKEY(A)+Q6.$RID$
+
+
+		Output Streams:
+		--------------
+			16) To Operator #17
+
+				Estimated number of rows: 	25
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.N_NATIONKEY(A)+Q6.$RID$
+
+
+	19) FILTER: (Filter)
+		Cumulative Total Cost: 		29.6378
+		Cumulative CPU Cost: 		178314
+		Cumulative I/O Cost: 		8.37782
+		Cumulative Re-Total Cost: 	22.5755
+		Cumulative Re-CPU Cost: 	124211
+		Cumulative Re-I/O Cost: 	6.37782
+		Cumulative First Row Cost: 	29.6378
+		Estimated Bufferpool Buffers: 	3.45095e+06
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			INNER
+
+		Predicates:
+		----------
+		6) Residual Predicate, 
+			Comparison Operator: 		Less Than (<)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.0177906
+
+			Predicate Text:
+			--------------
+			((+5.00000000000000E-001 * Q3.$C0) < Q4.PS_AVAILQTY)
+
+
+
+		Input Streams:
+		-------------
+			28) From Operator #20
+
+				Estimated number of rows: 	1
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0
+
+
+		Output Streams:
+		--------------
+			29) To Operator #4
+
+				Estimated number of rows: 	0.0177906
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0
+
+
+	20) GRPBY : (Group By)
+		Cumulative Total Cost: 		29.6372
+		Cumulative CPU Cost: 		176534
+		Cumulative I/O Cost: 		8.37782
+		Cumulative Re-Total Cost: 	22.5749
+		Cumulative Re-CPU Cost: 	122431
+		Cumulative Re-I/O Cost: 	6.37782
+		Cumulative First Row Cost: 	27.7413
+		Estimated Bufferpool Buffers: 	3.45095e+06
+
+		Arguments:
+		---------
+		AGGMODE : (Aggregation Mode)
+			COMPLETE
+		GROUPBYC: (Group By columns)
+			FALSE
+		GROUPBYN: (Number of Group By columns)
+			0
+		ONEFETCH: (One Fetch flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			27) From Operator #21
+
+				Estimated number of rows: 	1.1386
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q2.L_QUANTITY
+
+
+		Output Streams:
+		--------------
+			28) To Operator #19
+
+				Estimated number of rows: 	1
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0
+
+
+	21) FETCH : (Fetch)
+		Cumulative Total Cost: 		29.637
+		Cumulative CPU Cost: 		175989
+		Cumulative I/O Cost: 		8.37782
+		Cumulative Re-Total Cost: 	22.5748
+		Cumulative Re-CPU Cost: 	121886
+		Cumulative Re-I/O Cost: 	6.37782
+		Cumulative First Row Cost: 	27.4784
+		Estimated Bufferpool Buffers: 	3.45095e+06
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAX RIDS: (Maximum RIDs per list prefetch request)
+			512
+		PREFETCH: (Type of Prefetch)
+			LIST                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Predicates:
+		----------
+		10) Sargable Predicate, 
+			Comparison Operator: 		Less Than (<)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.582236
+
+			Predicate Text:
+			--------------
+			(Q1.L_SHIPDATE < '01/01/1996')
+
+
+		11) Sargable Predicate, 
+			Comparison Operator: 		Less Than or Equal (<=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.569521
+
+			Predicate Text:
+			--------------
+			('01/01/1995' <= Q1.L_SHIPDATE)
+
+
+		12) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1e-06
+
+			Predicate Text:
+			--------------
+			(Q1.L_SUPPKEY = Q4.PS_SUPPKEY)
+
+
+		13) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			5e-08
+
+			Predicate Text:
+			--------------
+			(Q1.L_PARTKEY = Q4.PS_PARTKEY)
+
+
+
+		Input Streams:
+		-------------
+			25) From Operator #22
+
+				Estimated number of rows: 	7.50277
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.$RID$(A)
+
+			26) From Object DB2INST1.LINEITEM
+
+				Estimated number of rows: 	6.00038e+08
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.L_QUANTITY+Q1.L_SHIPDATE+Q1.L_SUPPKEY
+				+Q1.L_PARTKEY
+
+
+		Output Streams:
+		--------------
+			27) To Operator #20
+
+				Estimated number of rows: 	1.1386
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q2.L_QUANTITY
+
+
+	22) RIDSCN: (Row Identifier Scan)
+		Cumulative Total Cost: 		14.1227
+		Cumulative CPU Cost: 		102714
+		Cumulative I/O Cost: 		2
+		Cumulative Re-Total Cost: 	7.06185
+		Cumulative Re-CPU Cost: 	52861.3
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	14.1223
+		Estimated Bufferpool Buffers: 	194039
+
+		Arguments:
+		---------
+		NUMROWS : (Estimated number of rows)
+			8
+
+		Input Streams:
+		-------------
+			24) From Operator #23
+
+				Estimated number of rows: 	7.50277
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.$RID$(A)
+
+
+		Output Streams:
+		--------------
+			25) To Operator #21
+
+				Estimated number of rows: 	7.50277
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.$RID$(A)
+
+
+	23) SORT  : (Sort)
+		Cumulative Total Cost: 		14.1223
+		Cumulative CPU Cost: 		101427
+		Cumulative I/O Cost: 		2
+		Cumulative Re-Total Cost: 	7.06077
+		Cumulative Re-CPU Cost: 	49448.6
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	14.1223
+		Estimated Bufferpool Buffers: 	194039
+
+		Arguments:
+		---------
+		DUPLWARN: (Duplicates Warning flag)
+			TRUE
+		NUMROWS : (Estimated number of rows)
+			8
+		ROWWIDTH: (Estimated width of rows)
+			20
+		SORTKEY : (Sort Key column)
+			1: Q1.$RID$(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			32768
+		UNIQUE  : (Uniqueness required flag)
+			TRUE
+
+		Input Streams:
+		-------------
+			23) From Operator #24
+
+				Estimated number of rows: 	7.50277
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.$RID$
+
+
+		Output Streams:
+		--------------
+			24) To Operator #22
+
+				Estimated number of rows: 	7.50277
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.$RID$(A)
+
+
+	24) IXSCAN: (Index Scan)
+		Cumulative Total Cost: 		14.1212
+		Cumulative CPU Cost: 		97909.6
+		Cumulative I/O Cost: 		2
+		Cumulative Re-Total Cost: 	7.06077
+		Cumulative Re-CPU Cost: 	49448.6
+		Cumulative Re-I/O Cost: 	1
+		Cumulative First Row Cost: 	14.1171
+		Estimated Bufferpool Buffers: 	194039
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			NONE
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		TABLOCK : (Table Lock intent)
+			INTENT NONE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		UR_EXTRA: (UR plus extra table lock and may upgrade to CS)
+			TRUE
+
+		Predicates:
+		----------
+		12) Start Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1e-06
+
+			Predicate Text:
+			--------------
+			(Q1.L_SUPPKEY = Q4.PS_SUPPKEY)
+
+
+		12) Stop Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1e-06
+
+			Predicate Text:
+			--------------
+			(Q1.L_SUPPKEY = Q4.PS_SUPPKEY)
+
+
+		13) Start Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			5e-08
+
+			Predicate Text:
+			--------------
+			(Q1.L_PARTKEY = Q4.PS_PARTKEY)
+
+
+		13) Stop Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			5e-08
+
+			Predicate Text:
+			--------------
+			(Q1.L_PARTKEY = Q4.PS_PARTKEY)
+
+
+
+		Input Streams:
+		-------------
+			22) From Object DB2INST1.I_L_SUPPKEY_PARTKEY
+
+				Estimated number of rows: 	6.00038e+08
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.$RID$+Q1.L_SUPPKEY+Q1.L_PARTKEY
+
+
+		Output Streams:
+		--------------
+			23) To Operator #23
+
+				Estimated number of rows: 	7.50277
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.$RID$
+
+
+Objects Used in Access Plan:
+---------------------------
+
+	Schema: DB2INST1
+	Name: 	I_L_SUPPKEY_PARTKEY
+	Type: 	Index
+			Time of creation: 		2013-11-23-13.14.58.803375
+			Last statistics update: 	2013-11-23-17.11.01.075877
+			Number of columns: 		2
+			Number of rows: 		600037902
+			Width of rows: 			-1
+			Number of buffer pool pages: 	2489526
+			Distinct row values: 		No
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Index clustering statistic: 	0.000002
+			Index leaf pages: 		194037
+			Index tree levels: 		3
+			Index full key cardinality: 	79975543
+			Index first key cardinality: 	20000000
+			Index first 2 keys cardinality: 79975543
+			Index first 3 keys cardinality: -1
+			Index first 4 keys cardinality: -1
+			Index sequential pages: 	194036
+			Index page density: 		99
+			Index avg sequential pages: 	194036
+			Index avg gap between sequences:0
+			Index avg random pages: 	0
+			Fetch avg sequential pages: 	-1
+			Fetch avg gap between sequences:-1
+			Fetch avg random pages: 	-1
+			Index RID count: 		600037902
+			Index deleted RID count: 	0
+			Index empty leaf pages: 	0
+			Base Table Schema: 		DB2INST1
+			Base Table Name: 		LINEITEM
+			Columns in index:
+				L_PARTKEY(A)
+				L_SUPPKEY(A)
+			Null keys: 			Yes
+
+	Schema: DB2INST1
+	Name: 	I_PS_PARTKEY
+	Type: 	Index
+			Time of creation: 		2013-11-23-13.14.59.102960
+			Last statistics update: 	2013-11-23-14.26.47.525934
+			Number of columns: 		1
+			Number of rows: 		80000000
+			Width of rows: 			-1
+			Number of buffer pool pages: 	383683
+			Distinct row values: 		No
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Index clustering statistic: 	1.000000
+			Index leaf pages: 		26694
+			Index tree levels: 		3
+			Index full key cardinality: 	20000000
+			Index first key cardinality: 	20000000
+			Index first 2 keys cardinality: -1
+			Index first 3 keys cardinality: -1
+			Index first 4 keys cardinality: -1
+			Index sequential pages: 	26691
+			Index page density: 		99
+			Index avg sequential pages: 	26691
+			Index avg gap between sequences:0
+			Index avg random pages: 	0
+			Fetch avg sequential pages: 	-1
+			Fetch avg gap between sequences:-1
+			Fetch avg random pages: 	-1
+			Index RID count: 		80000000
+			Index deleted RID count: 	0
+			Index empty leaf pages: 	0
+			Base Table Schema: 		DB2INST1
+			Base Table Name: 		PARTSUPP
+			Columns in index:
+				PS_PARTKEY(A)
+			Null keys: 			Yes
+
+	Schema: SYSIBM  
+	Name: 	SQL131123131458230
+	Type: 	Index
+			Time of creation: 		2013-11-23-13.14.58.229583
+			Last statistics update: 	2013-11-24-00.27.40.185909
+			Number of columns: 		1
+			Number of rows: 		1000000
+			Width of rows: 			-1
+			Number of buffer pool pages: 	5011
+			Distinct row values: 		Yes
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Index clustering statistic: 	1.000000
+			Index leaf pages: 		511
+			Index tree levels: 		2
+			Index full key cardinality: 	1000000
+			Index first key cardinality: 	1000000
+			Index first 2 keys cardinality: -1
+			Index first 3 keys cardinality: -1
+			Index first 4 keys cardinality: -1
+			Index sequential pages: 	510
+			Index page density: 		98
+			Index avg sequential pages: 	510
+			Index avg gap between sequences:0
+			Index avg random pages: 	0
+			Fetch avg sequential pages: 	-1
+			Fetch avg gap between sequences:-1
+			Fetch avg random pages: 	-1
+			Index RID count: 		1000000
+			Index deleted RID count: 	0
+			Index empty leaf pages: 	0
+			Base Table Schema: 		DB2INST1
+			Base Table Name: 		SUPPLIER
+			Columns in index:
+				S_SUPPKEY(A)
+			Null keys: 			Yes
+
+	Schema: SYSIBM  
+	Name: 	SQL131123131458630
+	Type: 	Index
+			Time of creation: 		2013-11-23-13.14.58.634494
+			Last statistics update: 	2013-11-23-14.45.49.706018
+			Number of columns: 		1
+			Number of rows: 		25
+			Width of rows: 			-1
+			Number of buffer pool pages: 	2
+			Distinct row values: 		Yes
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Index clustering statistic: 	100.000000
+			Index leaf pages: 		1
+			Index tree levels: 		1
+			Index full key cardinality: 	0
+			Index first key cardinality: 	0
+			Index first 2 keys cardinality: -1
+			Index first 3 keys cardinality: -1
+			Index first 4 keys cardinality: -1
+			Index sequential pages: 	0
+			Index page density: 		0
+			Index avg sequential pages: 	0
+			Index avg gap between sequences:0
+			Index avg random pages: 	0
+			Fetch avg sequential pages: 	-1
+			Fetch avg gap between sequences:-1
+			Fetch avg random pages: 	-1
+			Index RID count: 		0
+			Index deleted RID count: 	0
+			Index empty leaf pages: 	0
+			Base Table Schema: 		DB2INST1
+			Base Table Name: 		NATION
+			Columns in index:
+				N_NATIONKEY(A)
+			Null keys: 			Yes
+
+	Schema: DB2INST1
+	Name: 	LINEITEM
+	Type: 	Table
+			Time of creation: 		2013-11-23-13.14.55.501193
+			Last statistics update: 	2013-11-23-17.11.01.075877
+			Number of columns: 		16
+			Number of rows: 		600037902
+			Width of rows: 			50
+			Number of buffer pool pages: 	2489526
+			Number of data partitions: 	1
+			Distinct row values: 		No
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: DB2INST1
+	Name: 	NATION
+	Type: 	Table
+			Time of creation: 		2013-11-23-13.14.55.545161
+			Last statistics update: 	2013-11-23-15.21.13.940130
+			Number of columns: 		4
+			Number of rows: 		25
+			Width of rows: 			60
+			Number of buffer pool pages: 	2
+			Number of data partitions: 	1
+			Distinct row values: 		Yes
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: DB2INST1
+	Name: 	PART
+	Type: 	Table
+			Time of creation: 		2013-11-23-13.14.55.317404
+			Last statistics update: 	2013-11-23-15.06.50.576180
+			Number of columns: 		9
+			Number of rows: 		20000000
+			Width of rows: 			72
+			Number of buffer pool pages: 	94482
+			Number of data partitions: 	1
+			Distinct row values: 		No
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: DB2INST1
+	Name: 	PARTSUPP
+	Type: 	Table
+			Time of creation: 		2013-11-23-13.14.55.373402
+			Last statistics update: 	2013-11-23-15.07.27.417368
+			Number of columns: 		5
+			Number of rows: 		80000000
+			Width of rows: 			43
+			Number of buffer pool pages: 	383683
+			Number of data partitions: 	1
+			Distinct row values: 		No
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: DB2INST1
+	Name: 	SUPPLIER
+	Type: 	Table
+			Time of creation: 		2013-11-23-13.14.55.273960
+			Last statistics update: 	2013-11-24-00.27.40.185909
+			Number of columns: 		7
+			Number of rows: 		1000000
+			Width of rows: 			95
+			Number of buffer pool pages: 	5011
+			Number of data partitions: 	1
+			Distinct row values: 		Yes
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		16
+			Container extent page count: 	4
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+

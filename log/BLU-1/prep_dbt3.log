@@ -1,0 +1,279 @@
+
+   Database Connection Information
+
+ Database server        = DB2/LINUXX8664 10.5.2
+ SQL authorization ID   = DB2INST1
+ Local database alias   = TESTDB1
+
+DROP TABLE supplier
+DB20000I  The SQL command completed successfully.
+
+DROP TABLE part
+DB20000I  The SQL command completed successfully.
+
+DROP TABLE partsupp
+DB20000I  The SQL command completed successfully.
+
+DROP TABLE customer
+DB20000I  The SQL command completed successfully.
+
+DROP TABLE orders
+DB20000I  The SQL command completed successfully.
+
+DROP TABLE lineitem
+DB20000I  The SQL command completed successfully.
+
+DROP TABLE nation
+DB20000I  The SQL command completed successfully.
+
+DROP TABLE region
+DB20000I  The SQL command completed successfully.
+
+CREATE TABLE supplier ( s_suppkey  INTEGER, s_name CHAR(25), s_address VARCHAR(40), s_nationkey INTEGER, s_phone CHAR(15), s_acctbal REAL, s_comment VARCHAR(101))
+DB20000I  The SQL command completed successfully.
+
+CREATE TABLE part ( p_partkey INTEGER, p_name VARCHAR(55), p_mfgr CHAR(25), p_brand CHAR(10), p_type VARCHAR(25), p_size INTEGER, p_container CHAR(10), p_retailprice REAL, p_comment VARCHAR(23))
+DB20000I  The SQL command completed successfully.
+
+CREATE TABLE partsupp ( ps_partkey INTEGER, ps_suppkey INTEGER, ps_availqty INTEGER, ps_supplycost REAL, ps_comment VARCHAR(199))
+DB20000I  The SQL command completed successfully.
+
+CREATE TABLE customer ( c_custkey INTEGER, c_name VARCHAR(25), c_address VARCHAR(40), c_nationkey INTEGER, c_phone CHAR(15), c_acctbal REAL, c_mktsegment CHAR(10), c_comment VARCHAR(117))
+DB20000I  The SQL command completed successfully.
+
+CREATE TABLE orders ( o_orderkey INTEGER, o_custkey INTEGER, o_orderstatus CHAR(1), o_totalprice REAL, o_orderDATE DATE, o_orderpriority CHAR(15), o_clerk CHAR(15), o_shippriority INTEGER, o_comment VARCHAR(79))
+DB20000I  The SQL command completed successfully.
+
+CREATE TABLE lineitem ( l_orderkey INTEGER, l_partkey INTEGER, l_suppkey INTEGER, l_linenumber INTEGER, l_quantity REAL, l_extendedprice REAL, l_discount REAL, l_tax REAL, l_returnflag CHAR(1), l_linestatus CHAR(1), l_shipDATE DATE, l_commitDATE DATE, l_receiptDATE DATE, l_shipinstruct CHAR(25), l_shipmode CHAR(10), l_comment VARCHAR(44))
+DB20000I  The SQL command completed successfully.
+
+CREATE TABLE nation ( n_nationkey INTEGER, n_name CHAR(25), n_regionkey INTEGER, n_comment VARCHAR(152))
+DB20000I  The SQL command completed successfully.
+
+CREATE TABLE region ( r_regionkey INTEGER, r_name CHAR(25), r_comment VARCHAR(152))
+DB20000I  The SQL command completed successfully.
+
+GRANT SELECT ON nation TO PUBLIC
+DB20000I  The SQL command completed successfully.
+
+GRANT SELECT ON customer TO PUBLIC
+DB20000I  The SQL command completed successfully.
+
+GRANT SELECT ON part TO PUBLIC
+DB20000I  The SQL command completed successfully.
+
+GRANT SELECT ON partsupp TO PUBLIC
+DB20000I  The SQL command completed successfully.
+
+GRANT SELECT ON region TO PUBLIC
+DB20000I  The SQL command completed successfully.
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON lineitem TO PUBLIC
+DB20000I  The SQL command completed successfully.
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON orders TO PUBLIC
+DB20000I  The SQL command completed successfully.
+
+DESCRIBE TABLE supplier
+
+                                Data type                     Column
+Column name                     schema    Data type name      Length     Scale Nulls
+------------------------------- --------- ------------------- ---------- ----- ------
+S_SUPPKEY                       SYSIBM    INTEGER                      4     0 Yes   
+S_NAME                          SYSIBM    CHARACTER                   25     0 Yes   
+S_ADDRESS                       SYSIBM    VARCHAR                     40     0 Yes   
+S_NATIONKEY                     SYSIBM    INTEGER                      4     0 Yes   
+S_PHONE                         SYSIBM    CHARACTER                   15     0 Yes   
+S_ACCTBAL                       SYSIBM    REAL                         4     0 Yes   
+S_COMMENT                       SYSIBM    VARCHAR                    101     0 Yes   
+
+  7 record(s) selected.
+
+
+DESCRIBE TABLE part
+
+                                Data type                     Column
+Column name                     schema    Data type name      Length     Scale Nulls
+------------------------------- --------- ------------------- ---------- ----- ------
+P_PARTKEY                       SYSIBM    INTEGER                      4     0 Yes   
+P_NAME                          SYSIBM    VARCHAR                     55     0 Yes   
+P_MFGR                          SYSIBM    CHARACTER                   25     0 Yes   
+P_BRAND                         SYSIBM    CHARACTER                   10     0 Yes   
+P_TYPE                          SYSIBM    VARCHAR                     25     0 Yes   
+P_SIZE                          SYSIBM    INTEGER                      4     0 Yes   
+P_CONTAINER                     SYSIBM    CHARACTER                   10     0 Yes   
+P_RETAILPRICE                   SYSIBM    REAL                         4     0 Yes   
+P_COMMENT                       SYSIBM    VARCHAR                     23     0 Yes   
+
+  9 record(s) selected.
+
+
+DESCRIBE TABLE partsupp
+
+                                Data type                     Column
+Column name                     schema    Data type name      Length     Scale Nulls
+------------------------------- --------- ------------------- ---------- ----- ------
+PS_PARTKEY                      SYSIBM    INTEGER                      4     0 Yes   
+PS_SUPPKEY                      SYSIBM    INTEGER                      4     0 Yes   
+PS_AVAILQTY                     SYSIBM    INTEGER                      4     0 Yes   
+PS_SUPPLYCOST                   SYSIBM    REAL                         4     0 Yes   
+PS_COMMENT                      SYSIBM    VARCHAR                    199     0 Yes   
+
+  5 record(s) selected.
+
+
+DESCRIBE TABLE customer
+
+                                Data type                     Column
+Column name                     schema    Data type name      Length     Scale Nulls
+------------------------------- --------- ------------------- ---------- ----- ------
+C_CUSTKEY                       SYSIBM    INTEGER                      4     0 Yes   
+C_NAME                          SYSIBM    VARCHAR                     25     0 Yes   
+C_ADDRESS                       SYSIBM    VARCHAR                     40     0 Yes   
+C_NATIONKEY                     SYSIBM    INTEGER                      4     0 Yes   
+C_PHONE                         SYSIBM    CHARACTER                   15     0 Yes   
+C_ACCTBAL                       SYSIBM    REAL                         4     0 Yes   
+C_MKTSEGMENT                    SYSIBM    CHARACTER                   10     0 Yes   
+C_COMMENT                       SYSIBM    VARCHAR                    117     0 Yes   
+
+  8 record(s) selected.
+
+
+DESCRIBE TABLE orders
+
+                                Data type                     Column
+Column name                     schema    Data type name      Length     Scale Nulls
+------------------------------- --------- ------------------- ---------- ----- ------
+O_ORDERKEY                      SYSIBM    INTEGER                      4     0 Yes   
+O_CUSTKEY                       SYSIBM    INTEGER                      4     0 Yes   
+O_ORDERSTATUS                   SYSIBM    CHARACTER                    1     0 Yes   
+O_TOTALPRICE                    SYSIBM    REAL                         4     0 Yes   
+O_ORDERDATE                     SYSIBM    DATE                         4     0 Yes   
+O_ORDERPRIORITY                 SYSIBM    CHARACTER                   15     0 Yes   
+O_CLERK                         SYSIBM    CHARACTER                   15     0 Yes   
+O_SHIPPRIORITY                  SYSIBM    INTEGER                      4     0 Yes   
+O_COMMENT                       SYSIBM    VARCHAR                     79     0 Yes   
+
+  9 record(s) selected.
+
+
+DESCRIBE TABLE lineitem
+
+                                Data type                     Column
+Column name                     schema    Data type name      Length     Scale Nulls
+------------------------------- --------- ------------------- ---------- ----- ------
+L_ORDERKEY                      SYSIBM    INTEGER                      4     0 Yes   
+L_PARTKEY                       SYSIBM    INTEGER                      4     0 Yes   
+L_SUPPKEY                       SYSIBM    INTEGER                      4     0 Yes   
+L_LINENUMBER                    SYSIBM    INTEGER                      4     0 Yes   
+L_QUANTITY                      SYSIBM    REAL                         4     0 Yes   
+L_EXTENDEDPRICE                 SYSIBM    REAL                         4     0 Yes   
+L_DISCOUNT                      SYSIBM    REAL                         4     0 Yes   
+L_TAX                           SYSIBM    REAL                         4     0 Yes   
+L_RETURNFLAG                    SYSIBM    CHARACTER                    1     0 Yes   
+L_LINESTATUS                    SYSIBM    CHARACTER                    1     0 Yes   
+L_SHIPDATE                      SYSIBM    DATE                         4     0 Yes   
+L_COMMITDATE                    SYSIBM    DATE                         4     0 Yes   
+L_RECEIPTDATE                   SYSIBM    DATE                         4     0 Yes   
+L_SHIPINSTRUCT                  SYSIBM    CHARACTER                   25     0 Yes   
+L_SHIPMODE                      SYSIBM    CHARACTER                   10     0 Yes   
+L_COMMENT                       SYSIBM    VARCHAR                     44     0 Yes   
+
+  16 record(s) selected.
+
+
+DESCRIBE TABLE nation
+
+                                Data type                     Column
+Column name                     schema    Data type name      Length     Scale Nulls
+------------------------------- --------- ------------------- ---------- ----- ------
+N_NATIONKEY                     SYSIBM    INTEGER                      4     0 Yes   
+N_NAME                          SYSIBM    CHARACTER                   25     0 Yes   
+N_REGIONKEY                     SYSIBM    INTEGER                      4     0 Yes   
+N_COMMENT                       SYSIBM    VARCHAR                    152     0 Yes   
+
+  4 record(s) selected.
+
+
+DESCRIBE TABLE region
+
+                                Data type                     Column
+Column name                     schema    Data type name      Length     Scale Nulls
+------------------------------- --------- ------------------- ---------- ----- ------
+R_REGIONKEY                     SYSIBM    INTEGER                      4     0 Yes   
+R_NAME                          SYSIBM    CHARACTER                   25     0 Yes   
+R_COMMENT                       SYSIBM    VARCHAR                    152     0 Yes   
+
+  3 record(s) selected.
+
+
+SELECT varchar(tabschema,16) tabschema, varchar(tabname,16) tabname, tableorg FROM syscat.tables WHERE tabschema = 'DB2INST1' ORDER BY tabschema,tabname
+
+TABSCHEMA        TABNAME          TABLEORG
+---------------- ---------------- --------
+DB2INST1         ADVISE_INDEX     R       
+SQL0445W  Value "EXPLAIN_DIAGNOSTIC" has been truncated.  SQLSTATE=01004
+
+DB2INST1         ADVISE_INSTANCE  R       
+DB2INST1         ADVISE_MQT       R       
+DB2INST1         ADVISE_PARTITION R       
+DB2INST1         ADVISE_TABLE     R       
+DB2INST1         ADVISE_WORKLOAD  R       
+DB2INST1         CUSTOMER         C       
+DB2INST1         EXPLAIN_ACTUALS  R       
+DB2INST1         EXPLAIN_ARGUMENT R       
+DB2INST1         EXPLAIN_DIAGNOST R       
+DB2INST1         EXPLAIN_DIAGNOST R       
+DB2INST1         EXPLAIN_INSTANCE R       
+DB2INST1         EXPLAIN_OBJECT   R       
+DB2INST1         EXPLAIN_OPERATOR R       
+DB2INST1         EXPLAIN_PREDICAT R       
+DB2INST1         EXPLAIN_STATEMEN R       
+DB2INST1         EXPLAIN_STREAM   R       
+DB2INST1         LINEITEM         C       
+DB2INST1         NATION           C       
+DB2INST1         OBJECT_METRICS   R       
+DB2INST1         ORDERS           C       
+DB2INST1         PART             C       
+DB2INST1         PARTSUPP         C       
+DB2INST1         REGION           C       
+DB2INST1         SUPPLIER         C       
+
+  25 record(s) selected with 1 warning messages printed.
+
+
+SELECT varchar(tabname,16) tabname, data_object_p_size, index_object_p_size, col_object_p_size, data_object_p_size + index_object_p_size + col_object_p_size allsize FROM sysibmadm.admintabinfo WHERE tabschema = 'DB2INST1' ORDER BY tabname
+
+TABNAME          DATA_OBJECT_P_SIZE   INDEX_OBJECT_P_SIZE  COL_OBJECT_P_SIZE    ALLSIZE             
+---------------- -------------------- -------------------- -------------------- --------------------
+ADVISE_INDEX                      256                  256                    0                  512
+SQL0445W  Value "EXPLAIN_STATEMENT" has been truncated.  SQLSTATE=01004
+
+ADVISE_INSTANCE                   256                  256                    0                  512
+ADVISE_MQT                        256                  256                    0                  512
+ADVISE_PARTITION                  256                  256                    0                  512
+ADVISE_TABLE                      256                    0                    0                  256
+ADVISE_WORKLOAD                   256                    0                    0                  256
+CUSTOMER                          256                  256                  256                  768
+EXPLAIN_ACTUALS                   256                    0                    0                  256
+EXPLAIN_ARGUMENT                  256                  256                    0                  512
+EXPLAIN_DIAGNOST                  256                  256                    0                  512
+EXPLAIN_DIAGNOST                  256                  256                    0                  512
+EXPLAIN_INSTANCE                  256                  256                    0                  512
+EXPLAIN_OBJECT                    256                  256                    0                  512
+EXPLAIN_OPERATOR                  256                  256                    0                  512
+EXPLAIN_PREDICAT                  256                  256                    0                  512
+EXPLAIN_STATEMEN                  256                  256                    0                  512
+EXPLAIN_STREAM                    256                  256                    0                  512
+LINEITEM                          256                  256                  256                  768
+NATION                            256                  256                  256                  768
+OBJECT_METRICS                    256                  256                    0                  512
+ORDERS                            256                  256                  256                  768
+PART                              256                  256                  256                  768
+PARTSUPP                          256                  256                  256                  768
+REGION                            256                  256                  256                  768
+SUPPLIER                          256                  256                  256                  768
+
+  25 record(s) selected with 1 warning messages printed.
+
+

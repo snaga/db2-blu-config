@@ -1,0 +1,1213 @@
+DB2 Universal Database Version 10.5, 5622-044 (c) Copyright IBM Corp. 1991, 2012
+Licensed Material - Program Property of IBM
+IBM DATABASE 2 Explain Table Format Tool
+
+
+
+******************** EXPLAIN INSTANCE ********************
+
+DB2_VERSION:       10.05.2
+FORMATTED ON DB:   TESTDB1
+SOURCE_NAME:       SQLC2K26
+SOURCE_SCHEMA:     NULLID  
+SOURCE_VERSION:      
+EXPLAIN_TIME:      2013-11-26-21.03.43.227420
+EXPLAIN_REQUESTER: DB2INST1
+
+Database Context:
+----------------
+	Parallelism:          Intra-Partition Parallelism
+	CPU Speed:            3.188323e-07
+	Comm Speed:           100
+	Buffer Pool size:     120668
+	Sort Heap size:       49093
+	Database Heap size:   6248
+	Lock List size:       284488
+	Maximum Lock List:    98
+	Average Applications: 1
+	Locks Available:      8921544
+
+Package Context:
+---------------
+	SQL Type:           Dynamic
+	Optimization Level: 5
+	Blocking:           Block All Cursors
+	Isolation Level:    Cursor Stability
+
+
+
+---------------- STATEMENT 1  SECTION 201 ----------------
+	QUERYNO:       2
+	QUERYTAG:      CLP                 
+	Statement Type:   Select
+	Updatable:        No
+	Deletable:        No
+	Query Degree:     -1
+
+Original Statement:
+------------------
+select 
+  sum(l_extendedprice* (1 - l_discount)) as revenue 
+from 
+  lineitem,
+  part 
+where 
+  (p_partkey = l_partkey and 
+   p_brand = 'Brand#44' and 
+   p_container in ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG') and 
+   l_quantity >= 5 and 
+   l_quantity <= 5+10 and 
+   p_size between 1 and 5 and 
+   l_shipmode in ('AIR', 'AIR REG') and 
+   l_shipinstruct = 'DELIVER IN PERSON') or 
+  (p_partkey = l_partkey and 
+   p_brand = 'Brand#31' and 
+   p_container in ('MED BAG', 'MED BOX', 'MED PKG', 'MED PACK') and 
+   l_quantity >= 10 and 
+   l_quantity <= 10+10 and 
+   p_size between 1 and 10 and 
+   l_shipmode in ('AIR', 'AIR REG') and 
+   l_shipinstruct = 'DELIVER IN PERSON') or 
+  (p_partkey = l_partkey and 
+   p_brand = 'Brand#42' and 
+   p_container in ('LG CASE', 'LG BOX', 'LG PACK', 'LG PKG') and 
+   l_quantity >= 22 and 
+   l_quantity <= 22+10 and 
+   p_size between 1 and 15 and 
+   l_shipmode in ('AIR', 'AIR REG') and 
+   l_shipinstruct = 'DELIVER IN PERSON')
+
+
+Optimized Statement:
+-------------------
+SELECT 
+  Q11.$C0 AS "REVENUE" 
+FROM 
+  (SELECT 
+     SUM((Q10.L_EXTENDEDPRICE * (1 - Q10.L_DISCOUNT))) 
+   FROM 
+     (SELECT 
+        Q9.L_EXTENDEDPRICE,
+        Q9.L_DISCOUNT 
+      FROM 
+        DB2INST1.PART AS Q8,
+        DB2INST1.LINEITEM AS Q9 
+      WHERE 
+        (Q9.L_SHIPINSTRUCT = 'DELIVER IN PERSON        ') AND 
+        (Q8.P_SIZE >= 1) AND 
+        (Q8.P_PARTKEY = Q9.L_PARTKEY) AND 
+        Q8.P_CONTAINER IN ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG', 'MED BAG', 'MED BOX', 'MED PKG', 'MED PACK', 'LG CASE', 'LG BOX', 'LG PACK', 'LG PKG') AND 
+        Q8.P_BRAND IN ('Brand#44 ', 'Brand#31 ', 'Brand#42 ') AND 
+        Q9.L_SHIPMODE IN ('AIR', 'AIR REG') AND 
+        ((Q8.P_SIZE <= 5) OR 
+         ((Q8.P_SIZE <= 10) OR 
+          (Q8.P_SIZE <= 15))) AND 
+        (((Q9.L_QUANTITY >= 5) AND 
+          (Q9.L_QUANTITY <= 15)) OR 
+         (((Q9.L_QUANTITY >= 10) AND 
+           (Q9.L_QUANTITY <= 20)) OR 
+          ((Q9.L_QUANTITY >= 22) AND 
+           (Q9.L_QUANTITY <= 32)))) AND 
+        (((((((Q8.P_BRAND = 'Brand#44 ') AND 
+              Q8.P_CONTAINER IN ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG')) AND 
+             (Q9.L_QUANTITY >= 5)) AND 
+            (Q9.L_QUANTITY <= 15)) AND 
+           (Q8.P_SIZE <= 5)) OR 
+          (((((Q8.P_BRAND = 'Brand#31 ') AND 
+              Q8.P_CONTAINER IN ('MED BAG', 'MED BOX', 'MED PKG', 'MED PACK')) AND 
+             (Q9.L_QUANTITY >= 10)) AND 
+            (Q9.L_QUANTITY <= 20)) AND 
+           (Q8.P_SIZE <= 10))) OR 
+         (((((Q8.P_BRAND = 'Brand#42 ') AND 
+             Q8.P_CONTAINER IN ('LG CASE', 'LG BOX', 'LG PACK', 'LG PKG')) AND 
+            (Q9.L_QUANTITY >= 22)) AND 
+           (Q9.L_QUANTITY <= 32)) AND 
+          (Q8.P_SIZE <= 15)))
+     ) AS Q10
+  ) AS Q11
+
+Access Plan:
+-----------
+	Total Cost: 		5.71437e+06
+	Query Degree:		4
+
+                 Rows 
+                RETURN
+                (   1)
+                 Cost 
+                  I/O 
+                  |
+                   1 
+                GRPBY 
+                (   2)
+              5.71437e+06 
+              2.58401e+06 
+                  |
+                   1 
+                LTQ   
+                (   3)
+              5.71437e+06 
+              2.58401e+06 
+                  |
+                   1 
+                GRPBY 
+                (   4)
+              5.71437e+06 
+              2.58401e+06 
+                  |
+                90.5984 
+                ^HSJOIN
+                (   5)
+              5.71437e+06 
+              2.58401e+06 
+         /--------+--------\
+   9.86863e+06             357120 
+     TBSCAN                MSJOIN
+     (   6)                (   7)
+   5.5009e+06              212541 
+   2.48953e+06              94482 
+       |                /----+-----\
+   6.00038e+08        12            29760 
+ TABLE: DB2INST1    TBSCAN         FILTER
+    LINEITEM        (   8)         (  11)
+       Q9         0.00746283       212372 
+                       0            94482 
+                      |              |
+                      12         1.1904e+06 
+                    SORT           TBSCAN
+                    (   9)         (  12)
+                  0.00601628       212372 
+                       0            94482 
+                      |              |
+                      12         1.1904e+06 
+                    TBSCAN         SORT  
+                    (  10)         (  13)
+                  0.000143475      212372 
+                       0            94482 
+                      |              |
+                      12         1.1904e+06 
+               TABFNC: SYSIBM      TBSCAN
+                    GENROW         (  14)
+                      Q5           211369 
+                                    94482 
+                                     |
+                                    2e+07 
+                               TABLE: DB2INST1
+                                    PART
+                                     Q8
+
+
+Operator Symbols :
+------------------
+
+   Symbol      Description
+   ---------   ------------------------------------------
+   >JOIN     : Left outer join
+    JOIN<    : Right outer join
+   >JOIN<    : Full outer join
+   xJOIN     : Left antijoin
+    JOINx    : Right antijoin
+   ^JOIN     : Left early out
+    JOIN^    : Right early out
+   ATQ       : Asynchrony
+   BTQ       : Broadcast
+   CTQ       : Column-organized data
+   DTQ       : Directed
+   LTQ       : Intra-partition parallelism
+   MTQ       : Merging (sorted)
+   STQ       : Scatter
+   XTQ       : XML aggregation
+    TQ*      : Listener
+
+
+Extended Diagnostic Information:
+--------------------------------
+
+Diagnostic Identifier: 	1
+Diagnostic Details: 	EXP0256I  Analysis of the query shows that the
+			query might execute faster if an additional index
+			was created to enable zigzag join. Schema name:
+			"DB2INST1". Table name: "LINEITEM". Column list:
+			"(L_PARTKEY, L_SHIPMODE)".
+
+Plan Details:
+-------------
+
+
+	1) RETURN: (Return Result)
+		Cumulative Total Cost: 		5.71437e+06
+		Cumulative CPU Cost: 		1.70345e+12
+		Cumulative I/O Cost: 		2.58401e+06
+		Cumulative Re-Total Cost: 	5.71437e+06
+		Cumulative Re-CPU Cost: 	1.70345e+12
+		Cumulative Re-I/O Cost: 	2.58401e+06
+		Cumulative First Row Cost: 	5.71437e+06
+		Estimated Bufferpool Buffers: 	2.48953e+06
+
+		Arguments:
+		---------
+		BLDLEVEL: (Build level)
+			DB2 v10.5.0.2 : s131001
+		ENVVAR  : (Environment Variable)
+			DB2_WORKLOAD=ANALYTICS
+		HEAPUSE : (Maximum Statement Heap Usage)
+			208 Pages
+		PREPTIME: (Statement prepare time)
+			       142 milliseconds
+		STMTHEAP: (Statement heap size)
+			16384
+
+		Input Streams:
+		-------------
+			16) From Operator #2
+
+				Estimated number of rows: 	1
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q12.REVENUE
+
+
+	2) GRPBY : (Group By)
+		Cumulative Total Cost: 		5.71437e+06
+		Cumulative CPU Cost: 		1.70345e+12
+		Cumulative I/O Cost: 		2.58401e+06
+		Cumulative Re-Total Cost: 	5.71437e+06
+		Cumulative Re-CPU Cost: 	1.70345e+12
+		Cumulative Re-I/O Cost: 	2.58401e+06
+		Cumulative First Row Cost: 	5.71437e+06
+		Estimated Bufferpool Buffers: 	2.48953e+06
+
+		Arguments:
+		---------
+		AGGMODE : (Aggregation Mode)
+			FINAL
+		GROUPBYC: (Group By columns)
+			FALSE
+		GROUPBYN: (Number of Group By columns)
+			0
+		ONEFETCH: (One Fetch flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			15) From Operator #3
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.L_DISCOUNT+Q10.L_EXTENDEDPRICE
+
+
+		Output Streams:
+		--------------
+			16) To Operator #1
+
+				Estimated number of rows: 	1
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q12.REVENUE
+
+
+	3) TQ    : (Table Queue)
+		Cumulative Total Cost: 		5.71437e+06
+		Cumulative CPU Cost: 		1.70345e+12
+		Cumulative I/O Cost: 		2.58401e+06
+		Cumulative Re-Total Cost: 	5.71437e+06
+		Cumulative Re-CPU Cost: 	1.70345e+12
+		Cumulative Re-I/O Cost: 	2.58401e+06
+		Cumulative First Row Cost: 	5.71437e+06
+		Estimated Bufferpool Buffers: 	2.48953e+06
+
+		Arguments:
+		---------
+		LISTENER: (Listener Table Queue type)
+			FALSE
+		TQ TYPE : (Table queue type)
+			LOCAL
+		TQDEGREE: (Degree of Intra-Partition parallelism)
+			4
+		TQMERGE : (Merging Table Queue flag)
+			FALSE
+		TQREAD  : (Table Queue Read type)
+			READ AHEAD
+		UNIQUE  : (Uniqueness required flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			14) From Operator #4
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.L_DISCOUNT+Q10.L_EXTENDEDPRICE
+
+
+		Output Streams:
+		--------------
+			15) To Operator #2
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.L_DISCOUNT+Q10.L_EXTENDEDPRICE
+
+
+	4) GRPBY : (Group By)
+		Cumulative Total Cost: 		5.71437e+06
+		Cumulative CPU Cost: 		1.70345e+12
+		Cumulative I/O Cost: 		2.58401e+06
+		Cumulative Re-Total Cost: 	5.71437e+06
+		Cumulative Re-CPU Cost: 	1.70345e+12
+		Cumulative Re-I/O Cost: 	2.58401e+06
+		Cumulative First Row Cost: 	5.71437e+06
+		Estimated Bufferpool Buffers: 	2.48953e+06
+
+		Arguments:
+		---------
+		AGGMODE : (Aggregation Mode)
+			PARTIAL
+		GROUPBYC: (Group By columns)
+			FALSE
+		GROUPBYN: (Number of Group By columns)
+			0
+		ONEFETCH: (One Fetch flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			13) From Operator #5
+
+				Estimated number of rows: 	90.5984
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.L_DISCOUNT+Q10.L_EXTENDEDPRICE
+
+
+		Output Streams:
+		--------------
+			14) To Operator #3
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.L_DISCOUNT+Q10.L_EXTENDEDPRICE
+
+
+	5) HSJOIN: (Hash Join)
+		Cumulative Total Cost: 		5.71437e+06
+		Cumulative CPU Cost: 		1.70345e+12
+		Cumulative I/O Cost: 		2.58401e+06
+		Cumulative Re-Total Cost: 	5.71437e+06
+		Cumulative Re-CPU Cost: 	1.70345e+12
+		Cumulative Re-I/O Cost: 	2.58401e+06
+		Cumulative First Row Cost: 	5.71437e+06
+		Estimated Bufferpool Buffers: 	2.48953e+06
+
+		Arguments:
+		---------
+		BITFLTR : (Hash Join Bit Filter used)
+			747264
+		EARLYOUT: (Early Out flag)
+			LEFT
+		HASHCODE: (Hash Code Size)
+			24 BIT
+		HASHTBSZ: (Number of hash table entries)
+			357120
+		TEMPSIZE: (Temporary Table Page Size)
+			32768
+		TUPBLKSZ: (Tuple Block Size (bytes))
+			16000
+
+		Predicates:
+		----------
+		7) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			5e-08
+
+			Predicate Text:
+			--------------
+			(Q8.P_PARTKEY = Q9.L_PARTKEY)
+
+
+		27) Residual Predicate, 
+			Comparison Operator: 		Not Applicable
+			Subquery Input Required: 	No
+			Filter Factor: 			0.000514138
+
+			Predicate Text:
+			--------------
+			(((((((Q8.P_BRAND = 'Brand#44 ') AND 
+			      Q8.P_CONTAINER IN ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG')) AND 
+			     (Q9.L_QUANTITY >= 5)) AND 
+			    (Q9.L_QUANTITY <= 15)) AND 
+			   (Q8.P_SIZE <= 5)) OR 
+			  (((((Q8.P_BRAND = 'Brand#31 ') AND 
+			      Q8.P_CONTAINER IN ('MED BAG', 'MED BOX', 'MED PKG', 'MED PACK')) AND 
+			     (Q9.L_QUANTITY >= 10)) AND 
+			    (Q9.L_QUANTITY <= 20)) AND 
+			   (Q8.P_SIZE <= 10))) OR 
+			 (((((Q8.P_BRAND = 'Brand#42 ') AND 
+			     Q8.P_CONTAINER IN ('LG CASE', 'LG BOX', 'LG PACK', 'LG PKG')) AND 
+			    (Q9.L_QUANTITY >= 22)) AND 
+			   (Q9.L_QUANTITY <= 32)) AND 
+			  (Q8.P_SIZE <= 15)))
+
+
+
+		Input Streams:
+		-------------
+			2) From Operator #6
+
+				Estimated number of rows: 	9.86863e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.L_DISCOUNT+Q9.L_EXTENDEDPRICE
+				+Q9.L_QUANTITY+Q9.L_PARTKEY
+
+			12) From Operator #7
+
+				Estimated number of rows: 	357120
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_CONTAINER(A)+Q8.P_SIZE+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			13) To Operator #4
+
+				Estimated number of rows: 	90.5984
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.L_DISCOUNT+Q10.L_EXTENDEDPRICE
+
+
+	6) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		5.5009e+06
+		Cumulative CPU Cost: 		1.62696e+12
+		Cumulative I/O Cost: 		2.48953e+06
+		Cumulative Re-Total Cost: 	5.5009e+06
+		Cumulative Re-CPU Cost: 	1.62696e+12
+		Cumulative Re-I/O Cost: 	2.48953e+06
+		Cumulative First Row Cost: 	7.61023
+		Estimated Bufferpool Buffers: 	2.48953e+06
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		JN INPUT: (Join input leg)
+			OUTER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL          
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SCANGRAN: (Intra-Partition Parallelism Scan Granularity)
+			2
+		SCANTYPE: (Intra-Partition Parallelism Scan Type)
+			LOCAL PARALLEL
+		SCANUNIT: (Intra-Partition Parallelism Scan Unit)
+			PAGE
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			FAST
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+
+		Predicates:
+		----------
+		5) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.2265
+
+			Predicate Text:
+			--------------
+			(Q9.L_SHIPINSTRUCT = 'DELIVER IN PERSON        ')
+
+
+		10) Sargable Predicate, 
+			Comparison Operator: 		In List (IN), evaluated by binary search (list sorted at compile-time)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.1385
+
+			Predicate Text:
+			--------------
+			Q9.L_SHIPMODE IN ('AIR', 'AIR REG')
+
+
+		16) Sargable Predicate, 
+			Comparison Operator: 		Not Applicable
+			Subquery Input Required: 	No
+			Filter Factor: 			0.524276
+
+			Predicate Text:
+			--------------
+			(((Q9.L_QUANTITY >= 5) AND 
+			  (Q9.L_QUANTITY <= 15)) OR 
+			 (((Q9.L_QUANTITY >= 10) AND 
+			   (Q9.L_QUANTITY <= 20)) OR 
+			  ((Q9.L_QUANTITY >= 22) AND 
+			   (Q9.L_QUANTITY <= 32))))
+
+
+
+		Input Streams:
+		-------------
+			1) From Object DB2INST1.LINEITEM
+
+				Estimated number of rows: 	6.00038e+08
+				Number of columns: 		7
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.$RID$+Q9.L_DISCOUNT+Q9.L_EXTENDEDPRICE
+				+Q9.L_SHIPINSTRUCT+Q9.L_SHIPMODE+Q9.L_QUANTITY
+				+Q9.L_PARTKEY
+
+
+		Output Streams:
+		--------------
+			2) To Operator #5
+
+				Estimated number of rows: 	9.86863e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.L_DISCOUNT+Q9.L_EXTENDEDPRICE
+				+Q9.L_QUANTITY+Q9.L_PARTKEY
+
+
+	7) MSJOIN: (Merge Scan Join)
+		Cumulative Total Cost: 		212541
+		Cumulative CPU Cost: 		7.35665e+10
+		Cumulative I/O Cost: 		94482
+		Cumulative Re-Total Cost: 	212541
+		Cumulative Re-CPU Cost: 	7.35665e+10
+		Cumulative Re-I/O Cost: 	94482
+		Cumulative First Row Cost: 	212372
+		Estimated Bufferpool Buffers: 	37
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			NONE
+		INNERCOL: (Inner Order Columns)
+			1: Q8.P_CONTAINER(A)
+		JN INPUT: (Join input leg)
+			INNER
+		OUTERCOL: (Outer Order columns)
+			1: Q7.$C0(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			32768
+
+		Predicates:
+		----------
+		4) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.025
+
+			Predicate Text:
+			--------------
+			(Q8.P_CONTAINER = Q7.$C0)
+
+
+
+		Input Streams:
+		-------------
+			6) From Operator #8
+
+				Estimated number of rows: 	12
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.$C0(A)
+
+			11) From Operator #11
+
+				Estimated number of rows: 	29760
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_CONTAINER(A)+Q8.P_SIZE+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			12) To Operator #5
+
+				Estimated number of rows: 	357120
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_CONTAINER(A)+Q8.P_SIZE+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+	8) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		0.00746283
+		Cumulative CPU Cost: 		23406.7
+		Cumulative I/O Cost: 		0
+		Cumulative Re-Total Cost: 	0.00343446
+		Cumulative Re-CPU Cost: 	10772
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	0.00650633
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			OUTER
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			5) From Operator #9
+
+				Estimated number of rows: 	12
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.$C0(A)
+
+
+		Output Streams:
+		--------------
+			6) To Operator #7
+
+				Estimated number of rows: 	12
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.$C0(A)
+
+
+	9) SORT  : (Sort)
+		Cumulative Total Cost: 		0.00601628
+		Cumulative CPU Cost: 		18869.7
+		Cumulative I/O Cost: 		0
+		Cumulative Re-Total Cost: 	0.00198792
+		Cumulative Re-CPU Cost: 	6235
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	0.00601628
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		DUPLWARN: (Duplicates Warning flag)
+			TRUE
+		NUMROWS : (Estimated number of rows)
+			12
+		ROWWIDTH: (Estimated width of rows)
+			12
+		SORTKEY : (Sort Key column)
+			1: Q6.$C0(A)
+		SORTTYPE: (Intra-Partition parallelism sort type)
+			REPLICATED
+		TEMPSIZE: (Temporary Table Page Size)
+			32768
+		UNIQUE  : (Uniqueness required flag)
+			TRUE
+
+		Input Streams:
+		-------------
+			4) From Operator #10
+
+				Estimated number of rows: 	12
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.$C0
+
+
+		Output Streams:
+		--------------
+			5) To Operator #8
+
+				Estimated number of rows: 	12
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.$C0(A)
+
+
+	10) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		0.000143475
+		Cumulative CPU Cost: 		450
+		Cumulative I/O Cost: 		0
+		Cumulative Re-Total Cost: 	0.000143475
+		Cumulative Re-CPU Cost: 	450
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	2.86949e-05
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		GENRVALS: (GENROW IN List values)
+			Not Available
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SCANGRAN: (Intra-Partition Parallelism Scan Granularity)
+			1
+		SCANTYPE: (Intra-Partition Parallelism Scan Type)
+			LOCAL PARALLEL
+		SCANUNIT: (Intra-Partition Parallelism Scan Unit)
+			ROW
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			FAST
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+
+		Input Streams:
+		-------------
+			3) From Object SYSIBM.GENROW
+
+				Estimated number of rows: 	12
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.NUMB
+
+
+		Output Streams:
+		--------------
+			4) To Operator #9
+
+				Estimated number of rows: 	12
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.$C0
+
+
+	11) FILTER: (Filter)
+		Cumulative Total Cost: 		212372
+		Cumulative CPU Cost: 		7.30367e+10
+		Cumulative I/O Cost: 		94482
+		Cumulative Re-Total Cost: 	22162.6
+		Cumulative Re-CPU Cost: 	6.95118e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	212372
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			INNER
+
+		Predicates:
+		----------
+		4) Residual Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.025
+
+			Predicate Text:
+			--------------
+			(Q8.P_CONTAINER = Q7.$C0)
+
+
+
+		Input Streams:
+		-------------
+			10) From Operator #12
+
+				Estimated number of rows: 	1.1904e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_CONTAINER(A)+Q8.P_SIZE+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			11) To Operator #7
+
+				Estimated number of rows: 	29760
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_CONTAINER(A)+Q8.P_SIZE+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+	12) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		212372
+		Cumulative CPU Cost: 		7.30367e+10
+		Cumulative I/O Cost: 		94482
+		Cumulative Re-Total Cost: 	22162.6
+		Cumulative Re-CPU Cost: 	6.95118e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	212372
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			9) From Operator #13
+
+				Estimated number of rows: 	1.1904e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_CONTAINER(A)+Q8.P_SIZE+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			10) To Operator #11
+
+				Estimated number of rows: 	1.1904e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_CONTAINER(A)+Q8.P_SIZE+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+	13) SORT  : (Sort)
+		Cumulative Total Cost: 		212372
+		Cumulative CPU Cost: 		7.30367e+10
+		Cumulative I/O Cost: 		94482
+		Cumulative Re-Total Cost: 	22067.7
+		Cumulative Re-CPU Cost: 	6.92142e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	212372
+		Estimated Bufferpool Buffers: 	94482
+
+		Arguments:
+		---------
+		DUPLWARN: (Duplicates Warning flag)
+			FALSE
+		NUMROWS : (Estimated number of rows)
+			1190400
+		ROWWIDTH: (Estimated width of rows)
+			36
+		SORTKEY : (Sort Key column)
+			1: Q8.P_CONTAINER(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			32768
+		UNIQUE  : (Uniqueness required flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			8) From Operator #14
+
+				Estimated number of rows: 	1.1904e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_SIZE+Q8.P_CONTAINER+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			9) To Operator #12
+
+				Estimated number of rows: 	1.1904e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_CONTAINER(A)+Q8.P_SIZE+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+	14) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		211369
+		Cumulative CPU Cost: 		6.98898e+10
+		Cumulative I/O Cost: 		94482
+		Cumulative Re-Total Cost: 	22067.7
+		Cumulative Re-CPU Cost: 	6.92142e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	7.22922
+		Estimated Bufferpool Buffers: 	94482
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL          
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SCANGRAN: (Intra-Partition Parallelism Scan Granularity)
+			2
+		SCANTYPE: (Intra-Partition Parallelism Scan Type)
+			LOCAL PARALLEL
+		SCANUNIT: (Intra-Partition Parallelism Scan Unit)
+			PAGE
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			FAST
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+
+		Predicates:
+		----------
+		6) Sargable Predicate, 
+			Comparison Operator: 		Greater Than or Equal (>=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1
+
+			Predicate Text:
+			--------------
+			(Q8.P_SIZE >= 1)
+
+
+		9) Sargable Predicate, 
+			Comparison Operator: 		In List (IN), evaluated by binary search (list sorted at compile-time)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.12
+
+			Predicate Text:
+			--------------
+			Q8.P_BRAND IN ('Brand#44 ', 'Brand#31 ', 'Brand#42 ')
+
+
+		11) Sargable Predicate, 
+			Comparison Operator: 		Not Applicable
+			Subquery Input Required: 	No
+			Filter Factor: 			0.496
+
+			Predicate Text:
+			--------------
+			((Q8.P_SIZE <= 5) OR 
+			 ((Q8.P_SIZE <= 10) OR 
+			  (Q8.P_SIZE <= 15)))
+
+
+
+		Input Streams:
+		-------------
+			7) From Object DB2INST1.PART
+
+				Estimated number of rows: 	2e+07
+				Number of columns: 		5
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.$RID$+Q8.P_SIZE+Q8.P_CONTAINER+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+		Output Streams:
+		--------------
+			8) To Operator #13
+
+				Estimated number of rows: 	1.1904e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.P_SIZE+Q8.P_CONTAINER+Q8.P_BRAND
+				+Q8.P_PARTKEY
+
+
+Objects Used in Access Plan:
+---------------------------
+
+	Schema: DB2INST1
+	Name: 	LINEITEM
+	Type: 	Table
+			Time of creation: 		2013-11-25-05.23.43.884636
+			Last statistics update: 	2013-11-25-14.01.23.226089
+			Number of columns: 		16
+			Number of rows: 		600037902
+			Width of rows: 			87
+			Number of buffer pool pages: 	2489526
+			Number of data partitions: 	1
+			Distinct row values: 		No
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		4
+			Container extent page count: 	4
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: DB2INST1
+	Name: 	PART
+	Type: 	Table
+			Time of creation: 		2013-11-25-05.23.43.737622
+			Last statistics update: 	2013-11-25-08.43.05.910663
+			Number of columns: 		9
+			Number of rows: 		20000000
+			Width of rows: 			61
+			Number of buffer pool pages: 	94482
+			Number of data partitions: 	1
+			Distinct row values: 		No
+			Tablespace name: 		USERSPACE1
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.320000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		4
+			Container extent page count: 	4
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: SYSIBM  
+	Name: 	GENROW
+	Type: 	Table Function
+			Time of creation:
+			Last statistics update:
+			Number of columns: 		1
+			Number of rows: 		12
+			Width of rows: 			11
+			Number of buffer pool pages: 	-1
+			Distinct row values: 		No
+			Source for statistics: 		Single Node
+
