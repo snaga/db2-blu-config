@@ -74,6 +74,3 @@ date >> Q${QUERYFILE}.out
 sleep $INTERVAL;
 
 ../bin/stop-stats.sh
-
-echo "Subject: $QUERY/${DBNAME}${PARTITION} finished" | /usr/lib/sendmail snaga@uptime.jp
-
