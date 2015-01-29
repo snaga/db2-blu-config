@@ -11,8 +11,7 @@ QUERY=$3
 
 PSQL_OPTS="-p $PGPORT -U $PGUSER"
 
-#INTERVAL=30
-INTERVAL=0
+INTERVAL=30
 
 if [ "$PARTITION" = "1" ]; then
     echo -n ""
